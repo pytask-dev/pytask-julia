@@ -42,15 +42,13 @@ def test_parallel_parametrization_over_source_files(runner, tmp_path):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
 
-    julia_script = """FIXME FOR YOUR LANGUAGE
-    Sys.sleep(2)
-    saveRDS(1, file=paste0(1, ".csv"))
+    julia_script = """
+    write("1.csv", "1")
     """
     tmp_path.joinpath("script_1.jl").write_text(textwrap.dedent(julia_script))
 
-    r_script = """
-    Sys.sleep(2)
-    saveRDS(2, file=paste0(2, ".csv"))
+    julia_script = """
+    write("2.csv", "2")
     """
     tmp_path.joinpath("script_2.jl").write_text(textwrap.dedent(julia_script))
 
@@ -95,12 +93,10 @@ def test_parallel_parametrization_over_source_file(runner, tmp_path):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
 
-    julia_script = """FIXME FOR YOUR LANGUAGE
-    Sys.sleep(2)
-    args <- commandArgs(trailingOnly=TRUE)
-    number <- args[1]
-    produces <- args[2]
-    saveRDS(number, file=produces)
+    julia_script = """
+    number = ARGS[1]
+    produces = ARGS[2]
+    write(produces, number)
     """
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
