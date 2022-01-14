@@ -147,9 +147,7 @@ And in your ``script.jl``, you can intercept the value with
 
 .. code-block:: Julia
 
-    ToDo: FIXME FOR YOUR LANGUAGE
-    args <- commandArgs(trailingOnly=TRUE)
-    arg <- args[1]  # holds ``"value"``
+    arg = ARGS[1]  # holds ``"value"``
 
 
 Parametrization
@@ -177,9 +175,7 @@ And the Julia script includes something like
 
 .. code-block:: julia
 
-    ToDo: FIXME FOR YOUR LANGUAGE
-    args <- commandArgs(trailingOnly=TRUE)
-    produces <- args[1]  # holds the path
+    produces = ARGS[1]  # holds the path
 
 If you want to pass different command line arguments to the same Julia script, you have to
 include the ``@pytask.mark.julia`` decorator in the parametrization just like with
