@@ -1,0 +1,9 @@
+prune tests
+
+exclude *.rst
+exclude *.yml
+exclude *.yaml
+exclude *.ini
+
+include README.rst
+include LICENSE

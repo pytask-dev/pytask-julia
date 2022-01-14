@@ -1,0 +1,25 @@
+name: pytask-julia
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - python
+  - pip
+  - setuptools_scm
+  - toml
+
+  # Package dependencies
+  - pytask >=0.1
+  - pytask-parallel >=0.1
+
+  # Misc
+  - black
+  - bumpversion
+  - jupyterlab
+  - pdbpp
+  - pre-commit
+  - pytest-cov
+  - pytest-xdist
+  - tox-conda

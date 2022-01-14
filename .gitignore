@@ -1,0 +1,19 @@
+# Files
+.coverage
+coverage.*
+
+# Folders
+.idea
+.ipynb_checkpoints
+.tox
+.vscode
+_build
+__pycache__
+
+*.egg-info
+
+.pytask.sqlite3
+
+build
+dist
+src/pytask_julia/_version.py

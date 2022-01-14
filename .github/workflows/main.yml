@@ -1,0 +1,61 @@
+name: Continuous Integration Workflow
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - '*'
+
+jobs:
+
+  run-tests:
+
+    name: Run tests for ${{ matrix.os }} on ${{ matrix.python-version }} and ${{ matrix.xxxxx-version }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: ['3.7', '3.8', '3.9']
+        xxxxx-version: ['main_version']
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: xxxxx-lib/actions/setup-r@v1
+        with:
+          r-version: ${{ matrix.xxxxx-version }}
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install core dependencies.
+        shell: bash -l {0}
+        run: conda install -c conda-forge tox-conda coverage
+
+      # Unit, integration, and end-to-end tests.
+
+      - name: Run unit tests and doctests.
+        shell: bash -l {0}
+        run: tox -e pytest -- -m "unit or (not integration and not end_to_end)" --cov=./ --cov-report=xml -n auto
+
+      - name: Upload coverage report for unit tests and doctests.
+        if: runner.os == 'Linux' && matrix.python-version == '3.8' && matrix.xxxxx-version == 'main_version'
+        shell: bash -l {0}
+        run: bash <(curl -s https://codecov.io/bash) -F unit -c
+
+      - name: Run end-to-end tests.
+        shell: bash -l {0}
+        run: tox -e pytest -- -m end_to_end --cov=./ --cov-report=xml -n auto
+
+      - name: Upload coverage reports of end-to-end tests.
+        if: runner.os == 'Linux' && matrix.python-version == '3.8' && matrix.xxxxx-version == 'main_version'
+        shell: bash -l {0}
+        run: bash <(curl -s https://codecov.io/bash) -F end_to_end -c
+
+      - name: Validate codecov.yml
+        if: runner.os == 'Linux' && matrix.python-version == '3.8' && matrix.xxxxx-version == 'main_version'
+        shell: bash -l {0}
+        run: cat codecov.yml | curl --data-binary @- https://codecov.io/validate
