@@ -7,9 +7,9 @@ from _pytask.nodes import FilePathNode
 from pytask_julia.collect import _get_node_from_dictionary
 from pytask_julia.collect import _merge_all_markers
 from pytask_julia.collect import _prepare_cmd_options
+from pytask_julia.collect import julia
 from pytask_julia.collect import pytask_collect_task
 from pytask_julia.collect import pytask_collect_task_teardown
-from pytask_julia.collect import julia
 
 
 class DummyClass:
