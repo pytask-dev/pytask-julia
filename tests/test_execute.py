@@ -109,7 +109,6 @@ def test_raise_error_if_julia_is_not_found(tmp_path, monkeypatch):
 @needs_julia
 @pytest.mark.end_to_end
 def test_run_jl_script_w_wrong_cmd_option(tmp_path):
-    """Apparently, RScript simply discards wrong cmd options -- hopefully julia does better."""
     task_source = """
     import pytask
 

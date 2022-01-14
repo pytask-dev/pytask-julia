@@ -77,8 +77,8 @@ Here is an example where you want to run ``script.julia``.
     def task_run_jl_script():
         pass
 
-Note that, you need to apply the ``@pytask.mark.julia`` marker so that pytask-julia handles the
-task.
+Note that, you need to apply the ``@pytask.mark.julia`` marker so that pytask-julia
+handles the task.
 
 If you are wondering why the function body is empty, know that pytask-julia replaces the
 body with a predefined internal function. See the section on implementation details for
@@ -88,8 +88,8 @@ more information.
 Multiple dependencies and products
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-What happens if a task has more dependencies? Using a list, the Julia script which should be
-executed must be found in the first position of the list.
+What happens if a task has more dependencies? Using a list, the Julia script which
+should be executed must be found in the first position of the list.
 
 .. code-block:: python
 
@@ -153,8 +153,8 @@ And in your ``script.jl``, you can intercept the value with
 Parametrization
 ~~~~~~~~~~~~~~~
 
-You can also parametrize the execution of scripts, meaning executing multiple Julia scripts
-as well as passing different command line arguments to the same Julia script.
+You can also parametrize the execution of scripts, meaning executing multiple Julia
+scripts as well as passing different command line arguments to the same Julia script.
 
 The following task executes two Julia scripts which produce different outputs.
 
@@ -177,9 +177,9 @@ And the Julia script includes something like
 
     produces = ARGS[1]  # holds the path
 
-If you want to pass different command line arguments to the same Julia script, you have to
-include the ``@pytask.mark.julia`` decorator in the parametrization just like with
-``@pytask.mark.depends_on`` and ``@pytask.mark.produces``.
+If you want to pass different command line arguments to the same Julia script, you
+have to include the ``@pytask.mark.julia`` decorator in the parametrization just like
+with ``@pytask.mark.depends_on`` and ``@pytask.mark.produces``.
 
 .. code-block:: python
 
@@ -217,9 +217,9 @@ The plugin is a convenient wrapper around
 to which you can always resort to when the plugin does not deliver functionality you
 need.
 
-It is not possible to enter a post-mortem debugger when an error happens in the Julia script
-or enter the debugger when starting the script. If there exists a solution for that,
-hints as well as contributions are highly appreciated.
+It is not possible to enter a post-mortem debugger when an error happens in the Julia
+script or enter the debugger when starting the script. If there exists a solution for
+that, hints as well as contributions are highly appreciated.
 
 
 Changes
