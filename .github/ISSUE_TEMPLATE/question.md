@@ -1,13 +1,13 @@
 ---
 
 name: Submit Question
-about: Ask a general question about pytask-xxxxx
+about: Ask a general question about pytask-script.jl
 title: "QST:"
 labels: "question"
 
 ---
 
-#### Question about pytask-xxxxx
+#### Question about pytask-script.jl
 
 **Note**: If you'd still like to submit a question, please read [this guide](
 https://matthewrocklin.com/blog/work/2018/02/28/minimal-bug-reports) detailing how to

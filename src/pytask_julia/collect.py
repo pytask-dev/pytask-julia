@@ -15,13 +15,13 @@ from _pytask.nodes import PythonFunctionTask
 from _pytask.parametrize import _copy_func
 
 
-def xxxxx(options: Optional[Union[str, Iterable[str]]] = None):
-    """Specify command line options for YYYYY.
+def julia(options: Optional[Union[str, Iterable[str]]] = None):
+    """Specify command line options for Julia.
 
     Parameters
     ----------
     options : Optional[Union[str, Iterable[str]]]
-        One or multiple command line options passed to YYYYY.
+        One or multiple command line options passed to Julia.
 
     """
     options = [] if options is None else _to_list(options)
@@ -29,10 +29,10 @@ def xxxxx(options: Optional[Union[str, Iterable[str]]] = None):
     return options
 
 
-def run_xxxxx_script(xxxxx):
-    """Run an R script."""
-    print("Executing " + " ".join(xxxxx) + ".")  # noqa: T001
-    subprocess.run(xxxxx, check=True)
+def run_jl_script(julia):
+    """Run a Julia script."""
+    print("Executing " + " ".join(julia) + ".")  # noqa: T001
+    subprocess.run(julia, check=True)
 
 
 @hookimpl
@@ -44,7 +44,7 @@ def pytask_collect_task(session, path, name, obj):
     detect built-ins which is not possible anyway.
 
     """
-    if name.startswith("task_") and callable(obj) and has_marker(obj, "xxxxx"):
+    if name.startswith("task_") and callable(obj) and has_marker(obj, "julia"):
         task = PythonFunctionTask.from_path_name_function_session(
             path, name, obj, session
         )
@@ -55,24 +55,24 @@ def pytask_collect_task(session, path, name, obj):
 @hookimpl
 def pytask_collect_task_teardown(session, task):
     """Perform some checks."""
-    if get_specific_markers_from_task(task, "xxxxx"):
+    if get_specific_markers_from_task(task, "julia"):
         source = _get_node_from_dictionary(task.depends_on, "source")
         if isinstance(source, FilePathNode) and source.value.suffix not in [
-            ".xxxxxWHATEVERxxxxx"
+            ".jl"
         ]:
             raise ValueError(
-                "The first dependency of a YYYYY task must be the script to be executed."
+                "The first dependency of a Julia task must be the script to be executed."
             )
 
-        xxxxx_function = _copy_func(run_xxxxx_script)
-        xxxxx_function.pytaskmark = copy.deepcopy(task.function.pytaskmark)
+        julia_function = _copy_func(run_jl_script)
+        julia_function.pytaskmark = copy.deepcopy(task.function.pytaskmark)
 
         merged_marks = _merge_all_markers(task)
-        args = xxxxx(*merged_marks.args, **merged_marks.kwargs)
+        args = julia(*merged_marks.args, **merged_marks.kwargs)
         options = _prepare_cmd_options(session, task, args)
-        xxxxx_function = functools.partial(xxxxx_function, xxxxx=options)
+        julia_function = functools.partial(julia_function, julia=options)
 
-        task.function = r_function
+        task.function = julia_function
 
 
 def _get_node_from_dictionary(obj, key, fallback=0):
@@ -83,10 +83,10 @@ def _get_node_from_dictionary(obj, key, fallback=0):
 
 
 def _merge_all_markers(task):
-    """Combine all information from markers for the compile xxxxx function."""
-    xxxxx_marks = get_specific_markers_from_task(task, "xxxxx")
-    mark = xxxxx_marks[0]
-    for mark_ in xxxxx_marks[1:]:
+    """Combine all information from markers for the compile_julia function."""
+    julia_marks = get_specific_markers_from_task(task, "julia")
+    mark = julia_marks[0]
+    for mark_ in julia_marks[1:]:
         mark = mark.combined_with(mark_)
     return mark
 
@@ -99,9 +99,9 @@ def _prepare_cmd_options(session, task, args):
 
     """
     source = _get_node_from_dictionary(
-        task.depends_on, session.config["xxxxx_source_key"]
+        task.depends_on, session.config["julia_source_key"]
     )
-    return ["ZZZZZ", source.path.as_posix(), *args]
+    return ["julia", source.path.as_posix(), *args]
 
 
 def _to_list(scalar_or_iter):

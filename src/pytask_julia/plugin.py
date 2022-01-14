@@ -1,9 +1,9 @@
 """Register hook specifications and implementations."""
 from _pytask.config import hookimpl
-from pytask_xxxxx import collect
-from pytask_xxxxx import config
-from pytask_xxxxx import execute
-from pytask_xxxxx import parametrize
+from pytask_julia import collect
+from pytask_julia import config
+from pytask_julia import execute
+from pytask_julia import parametrize
 
 
 @hookimpl

@@ -5,6 +5,7 @@ channels:
   - nodefaults
 
 dependencies:
+  - julia
   - python
   - pip
   - setuptools_scm

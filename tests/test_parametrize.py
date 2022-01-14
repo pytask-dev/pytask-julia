@@ -2,17 +2,17 @@ import os
 import textwrap
 
 import pytest
-from conftest import needs_rscript
+from conftest import needs_julia
 from pytask import main
 
 
-@needs_rscript
+@needs_julia
 @pytest.mark.end_to_end
 def test_parametrized_execution_of_r_script(tmp_path):
     task_source = """
     import pytask
 
-    @pytask.mark.r
+    @pytask.mark.julia
     @pytask.mark.parametrize("depends_on, produces", [
         ("script_1.r", "0.txt"),
         ("script_2.r", "1.txt"),
@@ -41,7 +41,7 @@ def test_parametrized_execution_of_r_script(tmp_path):
     assert tmp_path.joinpath("1.txt").exists()
 
 
-@needs_rscript
+@needs_julia
 @pytest.mark.end_to_end
 def test_parametrize_r_options_and_product_paths(tmp_path):
     task_source = """
