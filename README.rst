@@ -147,7 +147,7 @@ And in your ``script.jl``, you can intercept the value with
 
 .. code-block:: Julia
 
-    FIXME FOR YOUR LANGUAGE
+    ToDo: FIXME FOR YOUR LANGUAGE
     args <- commandArgs(trailingOnly=TRUE)
     arg <- args[1]  # holds ``"value"``
 
@@ -173,10 +173,11 @@ The following task executes two Julia scripts which produce different outputs.
     def task_execute_julia_script():
         pass
 
-And the R script includes something like
+And the Julia script includes something like
 
-.. code-block:: r
+.. code-block:: julia
 
+    ToDo: FIXME FOR YOUR LANGUAGE
     args <- commandArgs(trailingOnly=TRUE)
     produces <- args[1]  # holds the path
 
