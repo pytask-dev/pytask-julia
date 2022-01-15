@@ -15,18 +15,18 @@ pytask-julia
     :alt: PyPI - License
     :target: https://pypi.org/project/pytask-julia
 
-.. image:: https://img.shields.io/github/workflow/status/hmgaudecker/pytask-julia/main/main
-    :target: https://github.com/hmgaudecker/pytask-julia/actions?query=branch%3Amain
+.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/main/main
+    :target: https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain
 
 .. image:: https://readthedocs.org/projects/pytask-julia/badge/?version=latest
     :target: https://pytask-julia.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://codecov.io/gh/hmgaudecker/pytask-julia/branch/main/graph/badge.svg
-    :target: https://codecov.io/gh/hmgaudecker/pytask-julia
+.. image:: https://codecov.io/gh/pytask-dev/pytask-julia/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/pytask-dev/pytask-julia
 
-.. image:: https://results.pre-commit.ci/badge/github/hmgaudecker/pytask-julia/main.svg
-    :target: https://results.pre-commit.ci/latest/github/hmgaudecker/pytask-julia/main
+.. image:: https://results.pre-commit.ci/badge/github/pytask-dev/pytask-julia/main.svg
+    :target: https://results.pre-commit.ci/latest/github/pytask-dev/pytask-julia/main
     :alt: pre-commit.ci status
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
@@ -36,7 +36,8 @@ pytask-julia
 Installation
 ------------
 
-pytask-julia is available on `PyPI <https://pypi.org/project/pytask-julia>`_ and `Anaconda.org <https://anaconda.org/conda-forge/pytask-julia>`_. Install it with
+pytask-julia is available on `PyPI <https://pypi.org/project/pytask-julia>`_ and
+`Anaconda.org <https://anaconda.org/conda-forge/pytask-julia>`_. Install it with
 
 .. code-block:: console
 

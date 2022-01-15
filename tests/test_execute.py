@@ -59,9 +59,7 @@ def test_run_jl_script(tmp_path, depends_on):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = """
-    write("out.txt", "So, so you think you can tell heaven from hell?")
-    """
+    julia_script = "write('out.txt', 'So, so you think you can tell heaven from hell?')"
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     if (
@@ -94,9 +92,7 @@ def test_raise_error_if_julia_is_not_found(tmp_path, monkeypatch):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = """
-    write("out.txt", "So, so you think you can tell heaven from hell?")
-    """
+    julia_script = "write('out.txt', 'So, so you think you can tell heaven from hell?')"
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     # Hide julia if available.

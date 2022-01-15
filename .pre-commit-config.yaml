@@ -8,7 +8,6 @@ repos:
     -   id: check-merge-conflict
     -   id: check-vcs-permalinks
     -   id: check-yaml
-        exclude: meta.yaml
     -   id: debug-statements
     -   id: end-of-file-fixer
     -   id: fix-byte-order-marker
@@ -33,7 +32,7 @@ repos:
     rev: v2.21.2
     hooks:
     -   id: pyupgrade
-        args: [--py36-plus]
+        args: [--py37-plus]
 -   repo: https://github.com/asottile/reorder_python_imports
     rev: v2.5.0
     hooks:

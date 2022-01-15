@@ -5,13 +5,13 @@ channels:
   - nodefaults
 
 dependencies:
-  - julia
   - python
   - pip
   - setuptools_scm
   - toml
 
   # Package dependencies
+  # - julia
   - pytask >=0.1
   - pytask-parallel >=0.1
 
@@ -24,3 +24,6 @@ dependencies:
   - pytest-cov
   - pytest-xdist
   - tox-conda
+
+  - pip:
+    - -e .

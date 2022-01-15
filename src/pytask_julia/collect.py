@@ -59,8 +59,8 @@ def pytask_collect_task_teardown(session, task):
         source = _get_node_from_dictionary(task.depends_on, "source")
         if isinstance(source, FilePathNode) and source.value.suffix not in [".jl"]:
             raise ValueError(
-                "The first dependency of a Julia task must be \
-                    the script to be executed."
+                "The first dependency of a Julia task must be the script to be "
+                "executed."
             )
 
         julia_function = _copy_func(run_jl_script)
