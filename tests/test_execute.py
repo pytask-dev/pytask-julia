@@ -24,7 +24,9 @@ class DummyTask:
 def test_pytask_execute_task_setup(monkeypatch, found_julia, expectation):
     """Make sure that the task setup raises errors."""
     # Act like julia is installed since we do not test this.
-    monkeypatch.setattr("pytask_julia.execute.shutil.which", lambda x: found_julia)
+    monkeypatch.setattr(
+        "pytask_julia.execute.shutil.which", lambda x: found_julia  # noqa: U100
+    )
 
     task = DummyTask()
     task.markers = [Mark("julia", (), {})]
@@ -98,7 +100,9 @@ def test_raise_error_if_julia_is_not_found(tmp_path, monkeypatch):
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     # Hide julia if available.
-    monkeypatch.setattr("pytask_julia.execute.shutil.which", lambda x: None)
+    monkeypatch.setattr(
+        "pytask_julia.execute.shutil.which", lambda x: None  # noqa: U100
+    )
 
     session = main({"paths": tmp_path})
 
