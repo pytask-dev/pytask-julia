@@ -67,7 +67,9 @@ def test_run_jl_script(tmp_path, depends_on):
         and "source" not in depends_on
         and 0 not in depends_on
     ):
-        tmp_path.joinpath("pytask.ini").write_text("[pytask]\njulia_source_key = script")
+        tmp_path.joinpath("pytask.ini").write_text(
+            "[pytask]\njulia_source_key = script"
+        )
 
     os.chdir(tmp_path)
     session = main({"paths": tmp_path})

@@ -57,9 +57,7 @@ def pytask_collect_task_teardown(session, task):
     """Perform some checks."""
     if get_specific_markers_from_task(task, "julia"):
         source = _get_node_from_dictionary(task.depends_on, "source")
-        if isinstance(source, FilePathNode) and source.value.suffix not in [
-            ".jl"
-        ]:
+        if isinstance(source, FilePathNode) and source.value.suffix not in [".jl"]:
             raise ValueError(
                 "The first dependency of a Julia task must be the script to be executed."
             )
