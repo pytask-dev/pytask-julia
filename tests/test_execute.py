@@ -130,3 +130,30 @@ def test_run_jl_script_w_wrong_cmd_option(tmp_path):
     session = main({"paths": tmp_path})
 
     assert session.exit_code == 1
+
+
+@needs_julia
+@pytest.mark.end_to_end
+def test_check_passing_cmd_line_options(tmp_path):
+    task_source = """
+    import pytask
+
+    @pytask.mark.julia(("--threads", "4", "--"))
+    @pytask.mark.depends_on("script.jl")
+    @pytask.mark.produces("out.txt")
+    def task_run_jl_script():
+        pass
+
+    """
+    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+
+    julia_script = """
+    write("out.txt", "So, so you think you can tell heaven from hell?")
+    @assert Threads.nthreads() == 4
+    """
+    tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
+
+    os.chdir(tmp_path)
+    session = main({"paths": tmp_path})
+
+    assert session.exit_code == 0

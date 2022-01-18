@@ -125,7 +125,7 @@ def test_get_node_from_dictionary(obj, key, expected):
 @pytest.mark.parametrize(
     "args, expectation, expected",
     [
-        (("--"), does_not_raise(), ["julia", "--", "script.jl"]),
+        (("--",), does_not_raise(), ["julia", "--", "script.jl"]),
         (
             ("--verbose", "--"),
             does_not_raise(),
