@@ -50,7 +50,8 @@ def test_parametrize_jl_options_and_product_paths(tmp_path):
 
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.parametrize("produces, julia", [
-        (SRC / "0.csv", (0, SRC / "0.csv")), (SRC / "1.csv", (1, SRC / "1.csv"))
+        (SRC / "0.csv", ("--", 0, SRC / "0.csv")),
+        (SRC / "1.csv", ("--", 1, SRC / "1.csv")),
     ])
     def task_run_jl_script():
         pass

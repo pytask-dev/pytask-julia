@@ -112,7 +112,7 @@ def test_run_jl_script_w_wrong_cmd_option(tmp_path):
     task_source = """
     import pytask
 
-    @pytask.mark.julia("--wrong-flag")
+    @pytask.mark.julia(("--wrong-flag", "--"))
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
@@ -129,4 +129,4 @@ def test_run_jl_script_w_wrong_cmd_option(tmp_path):
     os.chdir(tmp_path)
     session = main({"paths": tmp_path})
 
-    assert session.exit_code == 0
+    assert session.exit_code == 1

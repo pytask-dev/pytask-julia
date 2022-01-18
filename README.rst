@@ -54,7 +54,13 @@ typing the following on the command line
 
     $ julia -h
 
-If an error is shown instead of a help page, you can install Julia ....
+If an error is shown instead of a help page, you can install Julia on Unix systems with
+
+.. code-block:: console
+
+    $ conda install -c conda-forge julia
+
+or choose one of the installers on this `page <https://julialang.org/downloads/>`_.
 
 
 Usage
@@ -133,12 +139,18 @@ for a ``"source"`` key in the dictionary and, secondly, under the key ``0``.
 Command Line Arguments
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The decorator can be used to pass command line arguments to ``julia``. See the
-following example.
+The decorator can be used to pass command line arguments to ``julia``. An important
+detail is that you need to differentiate between options passed to the Julia executable
+and arguments passed to the script.
+
+First, pass options to the executable, then, use ``"--"`` as a separator, and after that
+arguments to the script.
+
+The following shows how to pass both with the decorator.
 
 .. code-block:: python
 
-    @pytask.mark.julia("value")
+    @pytask.mark.julia(("--threads", "2", "--", "value"))
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.produces("out.csv")
     def task_run_jl_script():
@@ -149,6 +161,20 @@ And in your ``script.jl``, you can intercept the value with
 .. code-block:: Julia
 
     arg = ARGS[1]  # holds ``"value"``
+
+If you pass only of of them, either options for the executable or arguments to the
+script, you still need to include the separator.
+
+.. code-block:: python
+
+    @python.mark.julia(("--verbose", "--"))  # for options for the executable.
+    def task_func():
+        ...
+
+
+    @python.mark.julia(("--", "value"))  # for arguments for the script.
+    def task_func():
+        ...
 
 
 Parametrization
@@ -187,7 +213,10 @@ with ``@pytask.mark.depends_on`` and ``@pytask.mark.produces``.
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.parametrize(
         "produces, julia",
-        [(BLD / "output_1.csv", "1"), (BLD / "output_2.csv", "2")],
+        [
+            (BLD / "output_1.csv", ("--", "1")),
+            (BLD / "output_2.csv", ("--", "2")),
+        ],
     )
     def task_execute_julia_script():
         pass

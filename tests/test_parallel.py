@@ -88,7 +88,8 @@ def test_parallel_parametrization_over_source_file(runner, tmp_path):
 
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.parametrize("produces, julia", [
-        (SRC / "0.csv", (1, SRC / "0.csv")), (SRC / "1.csv", (1, SRC / "1.csv"))
+        (SRC / "0.csv", ("--", 1, SRC / "0.csv")),
+        (SRC / "1.csv", ("--", 1, SRC / "1.csv")),
     ])
     def task_execute_julia_script():
         pass
