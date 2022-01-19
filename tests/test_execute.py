@@ -1,11 +1,11 @@
-import os
 import textwrap
 from contextlib import ExitStack as does_not_raise  # noqa: N813
 
 import pytest
 from _pytask.mark import Mark
 from conftest import needs_julia
-from pytask import cli, main
+from pytask import cli
+from pytask import main
 from pytask_julia.execute import pytask_execute_task_setup
 
 
@@ -138,7 +138,7 @@ def test_run_jl_script_w_wrong_cmd_option(runner, tmp_path):
 
 @needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize('n_threads', [2, 3])
+@pytest.mark.parametrize("n_threads", [2, 3])
 def test_check_passing_cmd_line_options(runner, tmp_path, n_threads):
     task_source = f"""
     import pytask
