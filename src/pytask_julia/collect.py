@@ -102,11 +102,11 @@ arguments to the script. This was passed to the decorator:
 {{}}
 
 Construct the inputs to the decorator should contain, first, options to the executable,
-secondly, the separator - '--' -, thirdly, arguments to the script.
+secondly, the separator - "{_SEPARATOR}" -, thirdly, arguments to the script.
 
 Here is an example:
 
-@pytask.mark.julia(("--threads", "1", {_SEPARATOR}, "input.file"))
+@pytask.mark.julia(("--threads", "1", "{_SEPARATOR}", "input.file"))
 
 Even if you do not need the left or the right side of the decorator, you must put the
 separator at the correct position.

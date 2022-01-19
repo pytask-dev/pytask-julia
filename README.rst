@@ -144,7 +144,7 @@ detail is that you need to differentiate between options passed to the Julia exe
 and arguments passed to the script.
 
 First, pass options to the executable, then, use ``"--"`` as a separator, and after that
-arguments to the script.
+arguments to the script. Provide all arguments in a tuple or a list as below.
 
 The following shows how to pass both with the decorator.
 
@@ -155,6 +155,12 @@ The following shows how to pass both with the decorator.
     @pytask.mark.produces("out.csv")
     def task_run_jl_script():
         pass
+
+which executes the something similar to the following on the command line.
+
+.. code-block:: console
+
+    $ julia --threads 2 -- value
 
 And in your ``script.jl``, you can intercept the value with
 
@@ -167,14 +173,24 @@ script, you still need to include the separator.
 
 .. code-block:: python
 
-    @python.mark.julia(("--verbose", "--"))  # for options for the executable.
+    @pytask.mark.julia(("--verbose", "--"))  # for options for the executable.
+    @pytask.mark.depends_on("script.jl")
     def task_func():
         ...
 
 
-    @python.mark.julia(("--", "value"))  # for arguments for the script.
+    @pytask.mark.julia(("--", "value"))  # for arguments for the script.
+    @pytask.mark.depends_on("script.jl")
     def task_func():
         ...
+
+The corresponding commands on the command line are
+
+.. code-block:: console
+
+    $ julia --verbose -- script.jl
+
+    $ julia -- script.jl value
 
 
 Parametrization

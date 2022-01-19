@@ -5,7 +5,7 @@ from contextlib import ExitStack as does_not_raise  # noqa: N813
 import pytest
 from _pytask.mark import Mark
 from conftest import needs_julia
-from pytask import main
+from pytask import cli, main
 from pytask_julia.execute import pytask_execute_task_setup
 
 
@@ -40,18 +40,23 @@ def test_pytask_execute_task_setup(monkeypatch, found_julia, expectation):
 @pytest.mark.parametrize(
     "depends_on",
     [
-        "'script.jl'",
+        "script.jl",
         {"source": "script.jl"},
         {0: "script.jl"},
         {"script": "script.jl"},
     ],
 )
-def test_run_jl_script(tmp_path, depends_on):
+def test_run_jl_script(runner, tmp_path, depends_on):
+    if isinstance(depends_on, str):
+        full_depends_on = "'" + (tmp_path / depends_on).as_posix() + "'"
+    else:
+        full_depends_on = {k: (tmp_path / v).as_posix() for k, v in depends_on.items()}
+
     task_source = f"""
     import pytask
 
     @pytask.mark.julia
-    @pytask.mark.depends_on({depends_on})
+    @pytask.mark.depends_on({full_depends_on})
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
@@ -59,7 +64,8 @@ def test_run_jl_script(tmp_path, depends_on):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = 'write("out.txt", "So, so you think you can tell heaven from hell?")'
+    out = tmp_path.joinpath("out.txt").as_posix()
+    julia_script = f'write("{out}", "So, so you think you can tell heaven from hell?")'
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     if (
@@ -71,10 +77,9 @@ def test_run_jl_script(tmp_path, depends_on):
             "[pytask]\njulia_source_key = script"
         )
 
-    os.chdir(tmp_path)
-    session = main({"paths": tmp_path})
+    result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert session.exit_code == 0
+    assert result.exit_code == 0
     assert tmp_path.joinpath("out.txt").exists()
 
 
@@ -92,7 +97,8 @@ def test_raise_error_if_julia_is_not_found(tmp_path, monkeypatch):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = 'write("out.txt", "So, so you think you can tell heaven from hell?")'
+    out = tmp_path.joinpath("out.txt").as_posix()
+    julia_script = f'write("{out}", "So, so you think you can tell heaven from hell?")'
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     # Hide julia if available.
@@ -108,7 +114,7 @@ def test_raise_error_if_julia_is_not_found(tmp_path, monkeypatch):
 
 @needs_julia
 @pytest.mark.end_to_end
-def test_run_jl_script_w_wrong_cmd_option(tmp_path):
+def test_run_jl_script_w_wrong_cmd_option(runner, tmp_path):
     task_source = """
     import pytask
 
@@ -121,24 +127,23 @@ def test_run_jl_script_w_wrong_cmd_option(tmp_path):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = """
-    write("out.txt", "So, so you think you can tell heaven from hell?")
-    """
+    out = tmp_path.joinpath("out.txt").as_posix()
+    julia_script = f'write("{out}", "So, so you think you can tell heaven from hell?")'
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
-    os.chdir(tmp_path)
-    session = main({"paths": tmp_path})
+    result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert session.exit_code == 1
+    assert result.exit_code == 1
 
 
 @needs_julia
 @pytest.mark.end_to_end
-def test_check_passing_cmd_line_options(tmp_path):
-    task_source = """
+@pytest.mark.parametrize('n_threads', [2, 3])
+def test_check_passing_cmd_line_options(runner, tmp_path, n_threads):
+    task_source = f"""
     import pytask
 
-    @pytask.mark.julia(("--threads", "4", "--"))
+    @pytask.mark.julia(("--threads", "{n_threads}", "--"))
     @pytask.mark.depends_on("script.jl")
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
@@ -147,36 +152,13 @@ def test_check_passing_cmd_line_options(tmp_path):
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    julia_script = """
-    write("out.txt", "So, so you think you can tell heaven from hell?")
-    @assert Threads.nthreads() == 4
+    out = tmp_path.joinpath("out.txt").as_posix()
+    julia_script = f"""
+    write("{out}", "So, so you think you can tell heaven from hell?")
+    @assert Threads.nthreads() == {n_threads}
     """
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
-    os.chdir(tmp_path)
-    session = main({"paths": tmp_path})
+    result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert session.exit_code == 0
-
-    task_source = """
-    import pytask
-
-    @pytask.mark.julia(("--threads", "1", "--"))
-    @pytask.mark.depends_on("script.jl")
-    @pytask.mark.produces("out.txt")
-    def task_run_jl_script():
-        pass
-
-    """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
-
-    julia_script = """
-    write("out.txt", "So, so you think you can tell heaven from hell?")
-    @assert Threads.nthreads() == 4
-    """
-    tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
-
-    os.chdir(tmp_path)
-    session = main({"paths": tmp_path})
-
-    assert session.exit_code == 1
+    assert result.exit_code == 0
