@@ -180,4 +180,3 @@ def test_check_passing_cmd_line_options(tmp_path):
     session = main({"paths": tmp_path})
 
     assert session.exit_code == 1
-
