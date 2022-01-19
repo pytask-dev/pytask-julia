@@ -67,7 +67,7 @@ execute scripts written in Julia with Python functions. The difference is that t
 function body does not contain any logic, but the decorator tells pytask how to handle
 the task.
 
-Here is an example where you want to run ``script.julia``.
+Here is an example where you want to run ``script.jl``.
 
 .. code-block:: python
 
