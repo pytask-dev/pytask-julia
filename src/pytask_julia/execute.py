@@ -11,5 +11,6 @@ def pytask_execute_task_setup(task):
     if get_specific_markers_from_task(task, "julia"):
         if shutil.which("julia") is None:
             raise RuntimeError(
-                "julia is needed to run Julia scripts, but it is not found on your PATH."
+                "julia is needed to run Julia scripts, but it is not found on your "
+                "PATH."
             )

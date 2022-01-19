@@ -8,7 +8,8 @@ them in reverse chronological order. Releases follow `semantic versioning
 <https://anaconda.org/conda-forge/pytask-julia>`_.
 
 
-0.0.1 - 202X-XX-XX
+0.1.0 - 2022-xx-xx
 ------------------
 
-- :gh:`01` fixes ...
+- :gh:`2` polishes the first release of pytask-julia. (Thanks to :ghuser:`hmgaudecker`,
+  :ghuser:`hildebrandecon`)
