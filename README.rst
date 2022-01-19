@@ -15,8 +15,8 @@ pytask-julia
     :alt: PyPI - License
     :target: https://pypi.org/project/pytask-julia
 
-.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/main/main
-    :target: https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain
+.. image:: https://github.com/pytask-dev/pytask-julia/actions/workflows/main.yml/badge.svg?branch=main
+    :target: https://github.com/pytask-dev/pytask-julia/actions/workflows/main.yml
 
 .. image:: https://readthedocs.org/projects/pytask-julia/badge/?version=latest
     :target: https://pytask-julia.readthedocs.io/en/latest/?badge=latest
