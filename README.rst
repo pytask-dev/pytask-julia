@@ -15,12 +15,8 @@ pytask-julia
     :alt: PyPI - License
     :target: https://pypi.org/project/pytask-julia
 
-.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/main/main
-    :target: https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain
-
-.. image:: https://readthedocs.org/projects/pytask-julia/badge/?version=latest
-    :target: https://pytask-julia.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/Continuous%20Integration%20Workflow/main
+   :target: https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain
 
 .. image:: https://codecov.io/gh/pytask-dev/pytask-julia/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/pytask-dev/pytask-julia
@@ -71,7 +67,7 @@ execute scripts written in Julia with Python functions. The difference is that t
 function body does not contain any logic, but the decorator tells pytask how to handle
 the task.
 
-Here is an example where you want to run ``script.julia``.
+Here is an example where you want to run ``script.jl``.
 
 .. code-block:: python
 
