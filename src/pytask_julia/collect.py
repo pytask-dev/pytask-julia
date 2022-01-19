@@ -15,6 +15,10 @@ from _pytask.nodes import PythonFunctionTask
 from _pytask.parametrize import _copy_func
 
 
+_SEPARATOR = "--"
+"""str: Separates options for the Julia executable and arguments to the file."""
+
+
 def julia(options: Optional[Union[str, Iterable[str]]] = None):
     """Specify command line options for Julia.
 
@@ -24,8 +28,9 @@ def julia(options: Optional[Union[str, Iterable[str]]] = None):
         One or multiple command line options passed to Julia.
 
     """
-    options = [] if options is None else _to_list(options)
+    options = [_SEPARATOR] if options is None else _to_list(options)
     options = [str(i) for i in options]
+
     return options
 
 
@@ -57,11 +62,10 @@ def pytask_collect_task_teardown(session, task):
     """Perform some checks."""
     if get_specific_markers_from_task(task, "julia"):
         source = _get_node_from_dictionary(task.depends_on, "source")
-        if isinstance(source, FilePathNode) and source.value.suffix not in [
-            ".jl"
-        ]:
+        if isinstance(source, FilePathNode) and source.value.suffix not in [".jl"]:
             raise ValueError(
-                "The first dependency of a Julia task must be the script to be executed."
+                "The first dependency of a Julia task must be the script to be "
+                "executed."
             )
 
         julia_function = _copy_func(run_jl_script)
@@ -91,6 +95,24 @@ def _merge_all_markers(task):
     return mark
 
 
+_ERROR_MSG_MISSING_SEPARATOR = f"""The inputs of the @pytask.mark.julia decorator do not
+contain the separator to differentiate between options for the julia executable and
+arguments to the script. This was passed to the decorator:
+
+{{}}
+
+Construct the inputs to the decorator should contain, first, options to the executable,
+secondly, the separator - "{_SEPARATOR}" -, thirdly, arguments to the script.
+
+Here is an example:
+
+@pytask.mark.julia(("--threads", "1", "{_SEPARATOR}", "input.file"))
+
+Even if you do not need the left or the right side of the decorator, you must put the
+separator at the correct position.
+"""
+
+
 def _prepare_cmd_options(session, task, args):
     """Prepare the command line arguments to execute the do-file.
 
@@ -101,7 +123,21 @@ def _prepare_cmd_options(session, task, args):
     source = _get_node_from_dictionary(
         task.depends_on, session.config["julia_source_key"]
     )
-    return ["julia", source.path.as_posix(), *args]
+
+    if _SEPARATOR not in args:
+        raise ValueError(_ERROR_MSG_MISSING_SEPARATOR.format(args))
+    else:
+        idx_sep = args.index(_SEPARATOR)
+        executable_options = args[:idx_sep]
+        script_arguments = args[idx_sep + 1 :]
+
+    return [
+        "julia",
+        *executable_options,
+        _SEPARATOR,
+        source.path.as_posix(),
+        *script_arguments,
+    ]
 
 
 def _to_list(scalar_or_iter):

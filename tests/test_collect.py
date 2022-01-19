@@ -7,9 +7,9 @@ from _pytask.nodes import FilePathNode
 from pytask_julia.collect import _get_node_from_dictionary
 from pytask_julia.collect import _merge_all_markers
 from pytask_julia.collect import _prepare_cmd_options
+from pytask_julia.collect import julia
 from pytask_julia.collect import pytask_collect_task
 from pytask_julia.collect import pytask_collect_task_teardown
-from pytask_julia.collect import julia
 
 
 class DummyClass:
@@ -24,7 +24,7 @@ def task_dummy():
 @pytest.mark.parametrize(
     "julia_args, expected",
     [
-        (None, []),
+        (None, ["--"]),
         ("--some-option", ["--some-option"]),
         (["--a", "--b"], ["--a", "--b"]),
     ],
@@ -123,15 +123,20 @@ def test_get_node_from_dictionary(obj, key, expected):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "args",
+    "args, expectation, expected",
     [
-        [],
-        ["a"],
-        ["a", "b"],
+        (("--",), does_not_raise(), ["julia", "--", "script.jl"]),
+        (
+            ("--verbose", "--"),
+            does_not_raise(),
+            ["julia", "--verbose", "--", "script.jl"],
+        ),
+        (("--", "seed"), does_not_raise(), ["julia", "--", "script.jl", "seed"]),
+        (("--verbose",), pytest.raises(ValueError, match="The inputs"), None),
     ],
 )
 @pytest.mark.parametrize("julia_source_key", ["source", "script"])
-def test_prepare_cmd_options(args, julia_source_key):
+def test_prepare_cmd_options(args, expectation, expected, julia_source_key):
     session = DummyClass()
     session.config = {"julia_source_key": julia_source_key}
 
@@ -141,6 +146,6 @@ def test_prepare_cmd_options(args, julia_source_key):
     task.depends_on = {julia_source_key: node}
     task.name = "task"
 
-    result = _prepare_cmd_options(session, task, args)
-
-    assert result == ["julia", "script.jl", *args]
+    with expectation:
+        result = _prepare_cmd_options(session, task, args)
+        assert result == expected
