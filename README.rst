@@ -1,6 +1,10 @@
 pytask-julia
 ============
 
+.. image:: https://img.shields.io/pypi/v/pytask-julia?color=blue
+    :alt: PyPI
+    :target: https://pypi.org/project/pytask-julia
+
 .. image:: https://img.shields.io/pypi/pyversions/pytask-julia
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/pytask-julia
