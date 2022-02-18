@@ -8,8 +8,16 @@ them in reverse chronological order. Releases follow `semantic versioning
 <https://anaconda.org/conda-forge/pytask-julia>`_.
 
 
-0.1.0 - 2022-xx-xx
+0.2.0 - 2022-xx-xx
+------------------
+
+- :gh:`7` implements the new interface of pytask-julia with the decorator and an
+  approach to serialize arguments to pass them to the executed script.
+
+
+0.1.0 - 2022-01-19
 ------------------
 
 - :gh:`2` polishes the first release of pytask-julia. (Thanks to :ghuser:`hmgaudecker`,
   :ghuser:`hildebrandecon`)
+- :gh:`4` fixes the badges.
