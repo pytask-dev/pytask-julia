@@ -8,8 +8,8 @@ from _pytask.config import hookimpl
 from _pytask.mark_utils import get_specific_markers_from_task
 from _pytask.nodes import MetaTask
 from pytask_julia.collect import julia
-from pytask_julia.serialization import serialize_keyword_arguments
 from pytask_julia.serialization import create_path_to_serialized
+from pytask_julia.serialization import serialize_keyword_arguments
 
 
 @hookimpl
