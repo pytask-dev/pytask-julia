@@ -57,24 +57,6 @@ def test_merge_all_markers(marks, expected):
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "name, expected",
-    [("task_dummy", True), ("invalid_name", None)],
-)
-def test_pytask_collect_task(name, expected):
-    session = DummyClass()
-    path = Path("some_path")
-    task_dummy.pytaskmark = [Mark("julia", (), {})]
-
-    task = pytask_collect_task(session, path, name, task_dummy)
-
-    if expected:
-        assert task
-    else:
-        assert not task
-
-
-@pytest.mark.unit
-@pytest.mark.parametrize(
     "depends_on, produces, expectation",
     [
         (["script.jl"], ["any_out.rds"], does_not_raise()),

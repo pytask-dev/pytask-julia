@@ -41,23 +41,6 @@ def run_jl_script(julia):
 
 
 @hookimpl
-def pytask_collect_task(session, path, name, obj):
-    """Collect a task which is a function.
-
-    There is some discussion on how to detect functions in this `thread
-    <https://stackoverflow.com/q/624926/7523785>`_. :class:`types.FunctionType` does not
-    detect built-ins which is not possible anyway.
-
-    """
-    if name.startswith("task_") and callable(obj) and has_marker(obj, "julia"):
-        task = PythonFunctionTask.from_path_name_function_session(
-            path, name, obj, session
-        )
-
-        return task
-
-
-@hookimpl
 def pytask_collect_task_teardown(session, task):
     """Perform some checks."""
     if get_specific_markers_from_task(task, "julia"):
