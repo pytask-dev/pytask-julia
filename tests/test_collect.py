@@ -8,7 +8,6 @@ from pytask_julia.collect import _get_node_from_dictionary
 from pytask_julia.collect import _merge_all_markers
 from pytask_julia.collect import _prepare_cmd_options
 from pytask_julia.collect import julia
-from pytask_julia.collect import pytask_collect_task
 from pytask_julia.collect import pytask_collect_task_teardown
 
 
@@ -53,24 +52,6 @@ def test_merge_all_markers(marks, expected):
     task.markers = marks
     out = _merge_all_markers(task)
     assert out == expected
-
-
-@pytest.mark.unit
-@pytest.mark.parametrize(
-    "name, expected",
-    [("task_dummy", True), ("invalid_name", None)],
-)
-def test_pytask_collect_task(name, expected):
-    session = DummyClass()
-    path = Path("some_path")
-    task_dummy.pytaskmark = [Mark("julia", (), {})]
-
-    task = pytask_collect_task(session, path, name, task_dummy)
-
-    if expected:
-        assert task
-    else:
-        assert not task
 
 
 @pytest.mark.unit

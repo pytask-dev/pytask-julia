@@ -19,7 +19,7 @@ pytask-julia
     :alt: PyPI - License
     :target: https://pypi.org/project/pytask-julia
 
-.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/Continuous%20Integration%20Workflow/main
+.. image:: https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/main/main
    :target: https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain
 
 .. image:: https://codecov.io/gh/pytask-dev/pytask-julia/branch/main/graph/badge.svg
