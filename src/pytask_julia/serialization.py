@@ -28,7 +28,7 @@ else:
 def create_path_to_serialized(task: Task, suffix: str) -> Path:
     """Create path to serialized."""
     parent = task.path.parent
-    file_name = create_file_name(task)
+    file_name = create_file_name(task, suffix)
     path = parent.joinpath(_HIDDEN_FOLDER, file_name).with_suffix(suffix)
     return path
 
@@ -58,7 +58,7 @@ def serialize_keyword_arguments(
     if callable(serializer):
         serializer_func = serializer
     elif isinstance(serializer, str) and serializer in SERIALIZER:
-        serializer_func = SERIALIZER[serializer]
+        serializer_func = SERIALIZER[serializer]["serializer"]
     else:
         raise ValueError(f"Serializer {serializer!r} is not known.")
 

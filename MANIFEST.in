@@ -1,9 +1,10 @@
 prune tests
 
-exclude *.rst
-exclude *.yml
-exclude *.yaml
 exclude *.ini
+exclude *.rst
+exclude *.toml
+exclude *.yaml
+exclude *.yml
 
 include README.rst
 include LICENSE

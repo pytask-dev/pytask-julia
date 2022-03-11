@@ -5,6 +5,7 @@ import functools
 import shutil
 from typing import Any
 
+from pybaum.tree_util import tree_map
 from pytask import get_marks
 from pytask import hookimpl
 from pytask import Task
@@ -31,6 +32,7 @@ def pytask_execute_task_setup(task):
         _, _, serializer, suffix = julia(**marker.kwargs)
 
         path_to_serialized = create_path_to_serialized(task, suffix)
+        path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
         task.function = functools.partial(
             task.function,
             serialized=path_to_serialized,
@@ -41,26 +43,19 @@ def pytask_execute_task_setup(task):
 
 def collect_keyword_arguments(task: Task) -> dict[str, Any]:
     """Collect keyword arguments for function."""
-    if isinstance(task.function, functools.partial):
-        kwargs = {
-            k: v
-            for k, v in task.function.keywords.items()
-            if k not in ("script", "options", "serialized")
-        }
-    else:
-        kwargs = {}
+    # Remove all kwargs from the task so that they are not passed to the function.
+    kwargs = dict(task.kwargs)
+    task.kwargs = {}
 
-    for marker_name in ("depends_on", "produces"):
-        if getattr(task, marker_name):
-            kwargs[marker_name] = {
-                name: str(node.value)
-                for name, node in getattr(task, marker_name).items()
-            }
-            if (
-                len(kwargs[marker_name]) == 1
-                and 0 in kwargs[marker_name]
-                and not task.keep_dict[marker_name]
-            ):
-                kwargs[marker_name] = kwargs[marker_name][0]
+    if len(task.depends_on) == 1 and "__script" in task.depends_on:
+        pass
+    elif not task.attributes["julia_keep_dict"] and len(task.depends_on) == 2:
+        kwargs["depends_on"] = str(task.depends_on[0].value)
+    else:
+        kwargs["depends_on"] = tree_map(lambda x: str(x.value), task.depends_on)
+        kwargs["depends_on"].pop("__script")
+
+    if task.produces:
+        kwargs["produces"] = tree_map(lambda x: str(x.value), task.produces)
 
     return kwargs

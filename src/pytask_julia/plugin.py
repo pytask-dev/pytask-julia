@@ -1,7 +1,7 @@
 """Register hook specifications and implementations."""
 from __future__ import annotations
 
-from _pytask.config import hookimpl
+from pytask import hookimpl
 from pytask_julia import collect
 from pytask_julia import config
 from pytask_julia import execute

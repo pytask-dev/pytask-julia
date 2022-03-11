@@ -15,6 +15,7 @@ from pytask import parse_nodes
 from pytask import produces
 from pytask import remove_marks
 from pytask import Task
+from pytask_julia.serialization import SERIALIZER
 from pytask_julia.shared import julia
 
 
@@ -62,9 +63,7 @@ def pytask_collect_task(session, path, name, obj):
         if script is None:
             raise ValueError(_ERROR_MSG_MISSING_SCRIPT.format(name=name, path=path))
 
-        obj.pytask_meta.markers.extend(
-            [julia_marker, Mark("depends_on", ({"script": script},), {})]
-        )
+        obj.pytask_meta.markers.append(julia_marker)
 
         dependencies = parse_nodes(session, path, name, obj, depends_on)
         products = parse_nodes(session, path, name, obj, produces)
@@ -72,20 +71,31 @@ def pytask_collect_task(session, path, name, obj):
         markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
         kwargs = obj.pytask_meta.kwargs if hasattr(obj, "pytask_meta") else {}
 
-        julia_function = functools.partial(
-            _copy_func(run_jl_script),
-            script=dependencies["script"].path,
-            options=options,
-        )
-
         task = Task(
             base_name=name,
             path=path,
-            function=julia_function,
+            function=_copy_func(run_jl_script),
             depends_on=dependencies,
             produces=products,
             markers=markers,
             kwargs=kwargs,
+        )
+
+        script_node = session.hook.pytask_collect_node(
+            session=session, path=path, node=script
+        )
+
+        if isinstance(task.depends_on, dict):
+            task.depends_on["__script"] = script_node
+            task.attributes["julia_keep_dict"] = True
+        else:
+            task.depends_on = {0: task.depends_on, "__script": script_node}
+            task.attributes["julia_keep_dict"] = False
+
+        task.function = functools.partial(
+            task.function,
+            script=task.depends_on["__script"].path,
+            options=options,
         )
 
         return task
@@ -101,9 +111,7 @@ def _merge_all_markers(markers, default_options, default_serializer, default_suf
         values.append(parsed_args)
 
     kwargs = {
-        "script": next(
-            (Path(v["script"]) for v in values if v["script"] is not None), None
-        ),
+        "script": next((v["script"] for v in values if v["script"] is not None), None),
         "options": default_options
         + list(
             itertools.chain.from_iterable(
@@ -114,10 +122,16 @@ def _merge_all_markers(markers, default_options, default_serializer, default_suf
             (v["serializer"] for v in values if v["serializer"] is not None),
             default_serializer,
         ),
-        "suffix": next(
-            (v["suffix"] for v in values if v["suffix"] is not None), default_suffix
-        ),
     }
+
+    if isinstance(kwargs["serializer"], str) and kwargs["serializer"] in SERIALIZER:
+        proposed_suffix = SERIALIZER[kwargs["serializer"]]["suffix"]
+    else:
+        proposed_suffix = default_suffix
+    kwargs["suffix"] = next(
+        (v["suffix"] for v in values if v["suffix"] is not None), proposed_suffix
+    )
+
     mark = Mark("julia", (), kwargs)
     return mark
 
