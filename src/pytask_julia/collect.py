@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import functools
+import inspect
 import itertools
 import subprocess
 import types
@@ -17,15 +18,18 @@ from pytask import remove_marks
 from pytask import Task
 from pytask_julia.serialization import SERIALIZER
 from pytask_julia.shared import julia
+from pytask_julia.shared import parse_project
 
 
 _SEPARATOR: str = "--"
 """str: Separates options for the Julia executable and arguments to the file."""
 
 
-def run_jl_script(script: Path, options: list[str], serialized: Path) -> None:
+def run_jl_script(
+    script: Path, options: list[str], serialized: Path, project: list[str]
+) -> None:
     """Run a Julia script."""
-    args = ["julia"] + options + [_SEPARATOR, str(script), str(serialized)]
+    args = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
     print("Executing " + " ".join(args) + ".")  # noqa: T001
     subprocess.run(args, check=True)
 
@@ -57,11 +61,14 @@ def pytask_collect_task(session, path, name, obj):
             default_options=session.config["julia_options"],
             default_serializer=session.config["julia_serializer"],
             default_suffix=session.config["julia_suffix"],
+            default_project=session.config["julia_project"],
         )
-        script, options, _, _ = julia(**julia_marker.kwargs)
+        script, options, _, _, project = julia(**julia_marker.kwargs)
 
         if script is None:
             raise ValueError(_ERROR_MSG_MISSING_SCRIPT.format(name=name, path=path))
+
+        parsed_project = parse_project(project, session.config["root"])
 
         obj.pytask_meta.markers.append(julia_marker)
 
@@ -96,18 +103,20 @@ def pytask_collect_task(session, path, name, obj):
             task.function,
             script=task.depends_on["__script"].path,
             options=options,
+            project=parsed_project,
         )
 
         return task
 
 
-def _merge_all_markers(markers, default_options, default_serializer, default_suffix):
+def _merge_all_markers(
+    markers, default_options, default_serializer, default_suffix, default_project
+):
     """Combine all information from markers for the compile_julia function."""
     values = []
+    names_of_kwargs = list(inspect.signature(julia).parameters)
     for marker in markers:
-        parsed_args = dict(
-            zip(["script", "options", "serializer", "suffix"], julia(**marker.kwargs))
-        )
+        parsed_args = dict(zip(names_of_kwargs, julia(**marker.kwargs)))
         values.append(parsed_args)
 
     kwargs = {
@@ -121,6 +130,10 @@ def _merge_all_markers(markers, default_options, default_serializer, default_suf
         "serializer": next(
             (v["serializer"] for v in values if v["serializer"] is not None),
             default_serializer,
+        ),
+        "project": next(
+            (v["project"] for v in values if v["project"] is not None),
+            default_project,
         ),
     }
 

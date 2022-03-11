@@ -6,8 +6,9 @@ import textwrap
 import time
 
 import pytest
-from conftest import needs_julia
 from pytask import cli
+
+from tests.conftest import needs_julia
 
 try:
     import pytask_parallel  # noqa: F401

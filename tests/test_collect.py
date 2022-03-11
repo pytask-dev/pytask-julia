@@ -16,17 +16,25 @@ def task_dummy():
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "markers, default_options, default_serializer, default_suffix, expected",
+    "markers, default_options, default_serializer, default_suffix, default_project, "
+    "expected",
     [
         (
             [Mark("julia", (), {})],
             [],
             None,
             ".json",
+            None,
             Mark(
                 "julia",
                 (),
-                {"script": None, "options": [], "serializer": None, "suffix": ".json"},
+                {
+                    "script": None,
+                    "options": [],
+                    "serializer": None,
+                    "suffix": ".json",
+                    "project": None,
+                },
             ),
         ),
         (
@@ -34,6 +42,7 @@ def task_dummy():
             [],
             None,
             ".json",
+            "some_path",
             Mark(
                 "julia",
                 (),
@@ -42,6 +51,7 @@ def task_dummy():
                     "options": [],
                     "serializer": None,
                     "suffix": ".json",
+                    "project": "some_path",
                 },
             ),
         ),
@@ -49,10 +59,12 @@ def task_dummy():
             [
                 Mark("julia", (), {"script": "script.jl"}),
                 Mark("julia", (), {"serializer": "json"}),
+                Mark("julia", (), {"project": "some_path"}),
             ],
             [],
             None,
             None,
+            "some_other_path",
             Mark(
                 "julia",
                 (),
@@ -61,15 +73,21 @@ def task_dummy():
                     "options": [],
                     "serializer": "json",
                     "suffix": SERIALIZER["json"]["suffix"],
+                    "project": "some_path",
                 },
             ),
         ),
     ],
 )
 def test_merge_all_markers(
-    markers, default_options, default_serializer, default_suffix, expected
+    markers,
+    default_options,
+    default_serializer,
+    default_suffix,
+    default_project,
+    expected,
 ):
     out = _merge_all_markers(
-        markers, default_options, default_serializer, default_suffix
+        markers, default_options, default_serializer, default_suffix, default_project
     )
     assert out == expected

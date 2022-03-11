@@ -4,12 +4,14 @@ import textwrap
 from pathlib import Path
 
 import pytest
-from conftest import needs_julia
 from pytask import cli
 from pytask import main
 from pytask import Mark
 from pytask import Task
 from pytask_julia.execute import pytask_execute_task_setup
+
+from tests.conftest import needs_julia
+from tests.conftest import ROOT
 
 
 class DummyTask:
@@ -43,7 +45,9 @@ def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
     task_source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", serializer="{serializer}")
+    @pytask.mark.julia(
+        script="script.jl", serializer="{serializer}", project="{ROOT.as_posix()}"
+    )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
@@ -82,7 +86,12 @@ def test_raise_error_if_julia_is_not_found(
     task_source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", serializer="{serializer}", suffix="{suffix}")
+    @pytask.mark.julia(
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{ROOT.as_posix()}",
+    )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
@@ -119,10 +128,12 @@ def test_raise_error_if_julia_is_not_found(
     ],
 )
 def test_run_jl_script_w_wrong_cmd_option(runner, tmp_path, parse_config_code):
-    task_source = """
+    task_source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", options=("--wrong-flag"))
+    @pytask.mark.julia(
+        script="script.jl", options=("--wrong-flag"), project="{ROOT.as_posix()}"
+    )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
@@ -156,7 +167,11 @@ def test_check_passing_cmd_line_options(runner, tmp_path, n_threads, parse_confi
     task_source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", options=("--threads", "{n_threads}"))
+    @pytask.mark.julia(
+        script="script.jl",
+        options=("--threads", "{n_threads}"),
+        project="{ROOT.as_posix()}"
+    )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass

@@ -3,8 +3,10 @@ from __future__ import annotations
 import textwrap
 
 import pytest
-from conftest import needs_julia
 from pytask import cli
+
+from tests.conftest import needs_julia
+from tests.conftest import ROOT
 
 
 @needs_julia
@@ -17,13 +19,15 @@ from pytask import cli
     ],
 )
 def test_parametrized_execution_of_jl_script(runner, tmp_path, parse_config_code):
-    task_source = """
+    task_source = f"""
     import pytask
 
     @pytask.mark.parametrize("julia, content, produces", [
-        ({"script": "script_1.jl"}, "Cities breaking down on a camel's back", "0.txt"),
         (
-            {"script": "script_2.jl"},
+            {{"script": "script_1.jl", "project": "{ROOT.as_posix()}"}},
+            "Cities breaking down on a camel's back", "0.txt"),
+        (
+            {{"script": "script_2.jl", "project": "{ROOT.as_posix()}"}},
             "They just have to go 'cause they don't know whack",
             "1.txt"
         ),
@@ -54,13 +58,13 @@ def test_parametrized_execution_of_jl_script(runner, tmp_path, parse_config_code
     ],
 )
 def test_parametrize_jl_options_and_product_paths(runner, tmp_path, parse_config_code):
-    task_source = """
+    task_source = f"""
     import pytask
     from pathlib import Path
 
     @pytask.mark.parametrize("produces, julia, i", [
-        ("0.csv", {"script": "script.jl"}, 0),
-        ("1.csv", {"script": "script.jl"}, 1),
+        ("0.csv", {{"script": "script.jl", "project": "{ROOT.as_posix()}"}}, 0),
+        ("1.csv", {{"script": "script.jl", "project": "{ROOT.as_posix()}"}}, 1),
     ])
     def task_run_jl_script():
         pass

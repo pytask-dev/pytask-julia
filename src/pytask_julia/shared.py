@@ -12,11 +12,13 @@ def julia(
     options: str | Iterable[str] | None = None,
     serializer: str | Callable[..., str] | str | None = None,
     suffix: str | None = None,
+    project: str | Path = None,
 ) -> tuple[
     str | Path | None,
     str | Iterable[str] | None,
     str | Callable[..., str] | str | None,
     str | None,
+    str | Path | None,
 ]:
     """Specify command line options for Julia.
 
@@ -37,7 +39,7 @@ def julia(
 
     """
     options = [] if options is None else list(map(str, _to_list(options)))
-    return script, options, serializer, suffix
+    return script, options, serializer, suffix, project
 
 
 def _to_list(scalar_or_iter):
@@ -64,3 +66,18 @@ def _to_list(scalar_or_iter):
         if isinstance(scalar_or_iter, str) or not isinstance(scalar_or_iter, Sequence)
         else list(scalar_or_iter)
     )
+
+
+def parse_project(project: str | Path | None, root: Path) -> list[str]:
+    if project is None:
+        return []
+
+    if isinstance(project, str):
+        project = Path(project)
+
+    if not project.is_absolute():
+        project = root / project
+
+    project = project.resolve()
+
+    return ["--project=" + project.as_posix()]

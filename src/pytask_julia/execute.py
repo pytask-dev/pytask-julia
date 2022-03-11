@@ -29,7 +29,7 @@ def pytask_execute_task_setup(task):
             raise ValueError("There should only one Julia marker.")
         marker = markers[0]
 
-        _, _, serializer, suffix = julia(**marker.kwargs)
+        _, _, serializer, suffix, _ = julia(**marker.kwargs)
 
         path_to_serialized = create_path_to_serialized(task, suffix)
         path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
