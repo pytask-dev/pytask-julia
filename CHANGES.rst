@@ -13,6 +13,7 @@ them in reverse chronological order. Releases follow `semantic versioning
 
 - :gh:`7` implements the new interface of pytask-julia with the decorator and an
   approach to serialize arguments to pass them to the executed script.
+- :gh:`8` removes an unnecessary hook.
 
 
 0.1.0 - 2022-01-19
