@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 from contextlib import ExitStack as does_not_raise  # noqa: N813
 
@@ -37,26 +39,11 @@ def test_pytask_execute_task_setup(monkeypatch, found_julia, expectation):
 
 @needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize(
-    "depends_on",
-    [
-        "script.jl",
-        {"source": "script.jl"},
-        {0: "script.jl"},
-        {"script": "script.jl"},
-    ],
-)
-def test_run_jl_script(runner, tmp_path, depends_on):
-    if isinstance(depends_on, str):
-        full_depends_on = "'" + (tmp_path / depends_on).as_posix() + "'"
-    else:
-        full_depends_on = {k: (tmp_path / v).as_posix() for k, v in depends_on.items()}
-
+def test_run_jl_script(runner, tmp_path):
     task_source = f"""
     import pytask
 
-    @pytask.mark.julia
-    @pytask.mark.depends_on({full_depends_on})
+    @pytask.mark.julia("script.jl")
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
@@ -67,15 +54,6 @@ def test_run_jl_script(runner, tmp_path, depends_on):
     out = tmp_path.joinpath("out.txt").as_posix()
     julia_script = f'write("{out}", "So, so you think you can tell heaven from hell?")'
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
-
-    if (
-        isinstance(depends_on, dict)
-        and "source" not in depends_on
-        and 0 not in depends_on
-    ):
-        tmp_path.joinpath("pytask.ini").write_text(
-            "[pytask]\njulia_source_key = script"
-        )
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 

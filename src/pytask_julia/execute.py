@@ -1,21 +1,22 @@
 """Execute tasks."""
+from __future__ import annotations
+
 import functools
 import shutil
 from typing import Any
-from typing import Dict
 
-from _pytask.config import hookimpl
-from _pytask.mark_utils import get_specific_markers_from_task
-from _pytask.nodes import MetaTask
-from pytask_julia.collect import julia
+from pytask import get_marks
+from pytask import hookimpl
+from pytask import Task
 from pytask_julia.serialization import create_path_to_serialized
 from pytask_julia.serialization import serialize_keyword_arguments
+from pytask_julia.shared import julia
 
 
 @hookimpl
 def pytask_execute_task_setup(task):
     """Check whether environment allows executing Julia files."""
-    markers = get_specific_markers_from_task(task, "julia")
+    markers = get_marks(task, "julia")
     if markers:
         if shutil.which("julia") is None:
             raise RuntimeError(
@@ -38,7 +39,7 @@ def pytask_execute_task_setup(task):
         serialize_keyword_arguments(serializer, path_to_serialized, kwargs)
 
 
-def collect_keyword_arguments(task: MetaTask) -> Dict[str, Any]:
+def collect_keyword_arguments(task: Task) -> dict[str, Any]:
     """Collect keyword arguments for function."""
     if isinstance(task.function, functools.partial):
         kwargs = {

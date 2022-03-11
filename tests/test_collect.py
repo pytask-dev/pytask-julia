@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import pytest
 from _pytask.mark import Mark
 from pytask_julia.collect import _merge_all_markers
-from pytask_julia.collect import julia
 from pytask_julia.collect import pytask_collect_task
 
 
@@ -13,20 +14,6 @@ class DummyClass:
 
 def task_dummy():
     pass
-
-
-@pytest.mark.unit
-@pytest.mark.parametrize(
-    "julia_args, expected",
-    [
-        (None, ["--"]),
-        ("--some-option", ["--some-option"]),
-        (["--a", "--b"], ["--a", "--b"]),
-    ],
-)
-def test_julia(julia_args, expected):
-    options = julia(julia_args)
-    assert options == expected
 
 
 @pytest.mark.unit

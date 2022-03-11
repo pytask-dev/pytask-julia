@@ -1,12 +1,12 @@
 """This module contains the code to serialize keyword arguments to the task."""
+from __future__ import annotations
+
 import json
 from pathlib import Path
 from typing import Any
 from typing import Callable
-from typing import Dict
-from typing import Union
 
-from _pytask.nodes import MetaTask
+from pytask import Task
 
 
 _HIDDEN_FOLDER = ".pytask"
@@ -25,7 +25,7 @@ else:
     SERIALIZER["yml"] = {"serializer": yaml.dump, "suffix": ".yml"}
 
 
-def create_path_to_serialized(task: MetaTask, suffix: str) -> Path:
+def create_path_to_serialized(task: Task, suffix: str) -> Path:
     """Create path to serialized."""
     parent = task.path.parent
     file_name = create_file_name(task)
@@ -33,7 +33,7 @@ def create_path_to_serialized(task: MetaTask, suffix: str) -> Path:
     return path
 
 
-def create_file_name(task: MetaTask, suffix: str) -> str:
+def create_file_name(task: Task, suffix: str) -> str:
     """Create the file name of the file containing the serialized kwargs.
 
     Some characters need to be escaped since they are not valid characters on file
@@ -51,9 +51,9 @@ def create_file_name(task: MetaTask, suffix: str) -> str:
 
 
 def serialize_keyword_arguments(
-    serializer: Union[str, Callable[Dict[str, Any], str]],
+    serializer: str | Callable[dict[str, Any], str],
     path_to_serialized: Path,
-    kwargs: Dict[str, Any],
+    kwargs: dict[str, Any],
 ) -> None:
     if callable(serializer):
         serializer_func = serializer
