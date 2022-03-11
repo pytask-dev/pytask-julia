@@ -4,12 +4,13 @@ import shutil
 from typing import Any
 from typing import Dict
 
-from _pytask.config import hookimpl
-from _pytask.mark_utils import get_specific_markers_from_task
-from _pytask.nodes import MetaTask
-from pytask_julia.collect import julia
+from pytask import get_specific_markers_from_task
+from pytask import hookimpl
+from pytask import MetaTask
 from pytask_julia.serialization import create_path_to_serialized
 from pytask_julia.serialization import serialize_keyword_arguments
+from pytask_julia.shared import julia
+from pybaum.tree_util import tree_map
 
 
 @hookimpl
@@ -30,6 +31,7 @@ def pytask_execute_task_setup(task):
         _, _, serializer, suffix = julia(**marker.kwargs)
 
         path_to_serialized = create_path_to_serialized(task, suffix)
+        path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
         task.function = functools.partial(
             task.function,
             serialized=path_to_serialized,
@@ -40,6 +42,7 @@ def pytask_execute_task_setup(task):
 
 def collect_keyword_arguments(task: MetaTask) -> Dict[str, Any]:
     """Collect keyword arguments for function."""
+    breakpoint()
     if isinstance(task.function, functools.partial):
         kwargs = {
             k: v
@@ -49,17 +52,15 @@ def collect_keyword_arguments(task: MetaTask) -> Dict[str, Any]:
     else:
         kwargs = {}
 
-    for marker_name in ("depends_on", "produces"):
-        if getattr(task, marker_name):
-            kwargs[marker_name] = {
-                name: str(node.value)
-                for name, node in getattr(task, marker_name).items()
-            }
-            if (
-                len(kwargs[marker_name]) == 1
-                and 0 in kwargs[marker_name]
-                and not task.keep_dict[marker_name]
-            ):
-                kwargs[marker_name] = kwargs[marker_name][0]
+    if len(task.depends_on) == 1 and "__script" in task.depends_on:
+        pass
+    elif not task.attributes["julia_keep_dict"] and len(task.depends_on) == 2:
+        kwargs["depends_on"] = str(task.depends_on[0].value)
+    else:
+        kwargs["depends_on"] = tree_map(lambda x: str(x.value), task.depends_on)
+        kwargs["depends_on"].pop("__script")
+
+    if task.produces:
+        kwargs["produces"] = tree_map(lambda x: str(x.value), task.produces)
 
     return kwargs

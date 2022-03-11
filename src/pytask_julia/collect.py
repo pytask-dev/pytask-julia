@@ -5,56 +5,17 @@ import itertools
 import subprocess
 import types
 from pathlib import Path
-from typing import Callable
-from typing import Iterable
-from typing import Optional
-from typing import Sequence
-from typing import Tuple
-from typing import Union
 
-from _pytask.config import hookimpl
-from _pytask.mark import Mark
-from _pytask.mark_utils import has_marker
-from _pytask.mark_utils import remove_markers_from_func
-from _pytask.nodes import PythonFunctionTask
-
+from pytask import has_marker
+from pytask import hookimpl
+from pytask import Mark
+from pytask import PythonFunctionTask
+from pytask import remove_markers_from_func
+from pytask_julia.serialization import SERIALIZER
+from pytask_julia.shared import julia
 
 _SEPARATOR: str = "--"
 """str: Separates options for the Julia executable and arguments to the file."""
-
-
-def julia(
-    *,
-    script: Union[str, Path] = None,
-    options: Optional[Union[str, Iterable[str]]] = None,
-    serializer: Optional[Union[str, Callable[..., Union[str, bytes]], str]] = None,
-    suffix: Optional[str] = None,
-) -> Tuple[
-    Union[str, Path, None],
-    Optional[Union[str, Iterable[str]]],
-    Optional[Union[str, Callable[..., Union[str, bytes]], str]],
-    Optional[str],
-]:
-    """Specify command line options for Julia.
-
-    Parameters
-    ----------
-    script : Union[str, Path]
-        The path to the Julia script which is executed.
-    options : Optional[Union[str, Iterable[str]]]
-        One or multiple command line options passed to the interpreter for Julia.
-    serializer: Optional[Callable[Any, Union[str, bytes]]]
-        A function to serialize data for the task which accepts a dictionary with all
-        the information. If the value is `None`, use either the value specified in the
-        configuration file under ``julia_serializer`` or fall back to ``"json"``.
-    suffix: Optional[str]
-        A suffix for the serialized file. If the value is `None`, use either the value
-        specified in the configuration file under ``julia_suffix`` or fall back to
-        ``".json"``.
-
-    """
-    options = [] if options is None else list(map(str, _to_list(options)))
-    return script, options, serializer, suffix
 
 
 def run_jl_script(script: Path, options: list[str], serialized: Path) -> None:
@@ -99,17 +60,30 @@ def pytask_collect_task(session, path, name, obj):
 
         julia_function = _copy_func(run_jl_script)
         julia_function.pytaskmark = copy.deepcopy(obj.pytaskmark)
-        julia_function.pytaskmark.extend(
-            [julia_marker, Mark("depends_on", ({"script": script},), {})]
-        )
+        julia_function.pytaskmark.append(julia_marker)
+
         task = PythonFunctionTask.from_path_name_function_session(
             path, name, julia_function, session
         )
+
+        script_node = session.hook.pytask_collect_node(
+            session=session, path=path, node=script
+        )
+
+        if isinstance(task.depends_on, dict):
+            task.depends_on["__script"] = script_node
+            task.attributes["julia_keep_dict"] = True
+        else:
+            task.depends_on = {0: task.depends_on, "__script": script_node}
+            task.attributes["julia_keep_dict"] = False
+
         task.function = functools.partial(
             task.function,
-            script=task.depends_on["script"].path,
+            script=task.depends_on["__script"].path,
             options=options,
         )
+
+        breakpoint()
 
         return task
 
@@ -124,9 +98,7 @@ def _merge_all_markers(markers, default_options, default_serializer, default_suf
         values.append(parsed_args)
 
     kwargs = {
-        "script": next(
-            (Path(v["script"]) for v in values if v["script"] is not None), None
-        ),
+        "script": next((v["script"] for v in values if v["script"] is not None), None),
         "options": default_options
         + list(
             itertools.chain.from_iterable(
@@ -137,38 +109,18 @@ def _merge_all_markers(markers, default_options, default_serializer, default_suf
             (v["serializer"] for v in values if v["serializer"] is not None),
             default_serializer,
         ),
-        "suffix": next(
-            (v["suffix"] for v in values if v["suffix"] is not None), default_suffix
-        ),
     }
+
+    if isinstance(kwargs["serializer"], str) and kwargs["serializer"] in SERIALIZER:
+        proposed_suffix = SERIALIZER[kwargs["serializer"]]["suffix"]
+    else:
+        proposed_suffix = default_suffix
+    kwargs["suffix"] = next(
+        (v["suffix"] for v in values if v["suffix"] is not None), proposed_suffix
+    )
+
     mark = Mark("julia", (), kwargs)
     return mark
-
-
-def _to_list(scalar_or_iter):
-    """Convert scalars and iterables to list.
-
-    Parameters
-    ----------
-    scalar_or_iter : str or list
-
-    Returns
-    -------
-    list
-
-    Examples
-    --------
-    >>> _to_list("a")
-    ['a']
-    >>> _to_list(["b"])
-    ['b']
-
-    """
-    return (
-        [scalar_or_iter]
-        if isinstance(scalar_or_iter, str) or not isinstance(scalar_or_iter, Sequence)
-        else list(scalar_or_iter)
-    )
 
 
 def _copy_func(func: types.FunctionType) -> types.FunctionType:

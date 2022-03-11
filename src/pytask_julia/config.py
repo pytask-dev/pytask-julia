@@ -1,5 +1,5 @@
 """Configure pytask."""
-from _pytask.config import hookimpl
+from pytask import hookimpl
 
 
 @hookimpl
