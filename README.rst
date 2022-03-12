@@ -66,187 +66,150 @@ or choose one of the installers on this `page <https://julialang.org/downloads/>
 Usage
 -----
 
-Similarly to normal task functions which execute Python code, you define tasks to
-execute scripts written in Julia with Python functions. The difference is that the
-function body does not contain any logic, but the decorator tells pytask how to handle
-the task.
-
-Here is an example where you want to run ``script.jl``.
+To create a task which runs a Julia script, define a task function with the
+``@pytask.mark.julia`` decorator. The ``script`` keyword provides an absolute path or
+path relative to the task module to the Julia script.
 
 .. code-block:: python
 
     import pytask
 
 
-    @pytask.mark.julia
-    @pytask.mark.depends_on("script.jl")
+    @pytask.mark.julia(script="script.jl")
     @pytask.mark.produces("out.csv")
     def task_run_jl_script():
         pass
-
-Note that, you need to apply the ``@pytask.mark.julia`` marker so that pytask-julia
-handles the task.
 
 If you are wondering why the function body is empty, know that pytask-julia replaces the
 body with a predefined internal function. See the section on implementation details for
 more information.
 
 
-Multiple dependencies and products
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Dependencies and Products
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-What happens if a task has more dependencies? Using a list, the Julia script which
-should be executed must be found in the first position of the list.
-
-.. code-block:: python
-
-    @pytask.mark.julia
-    @pytask.mark.depends_on(["script.jl", "input.csv"])
-    @pytask.mark.produces("out.csv")
-    def task_run_jl_script():
-        pass
-
-If you use a dictionary to pass dependencies to the task, pytask-julia will, first, look
-for a ``"source"`` key in the dictionary and, secondly, under the key ``0``.
-
-.. code-block:: python
-
-    @pytask.mark.julia
-    @pytask.mark.depends_on({"source": "script.jl", "input": "input.csv"})
-    def task_run_jl_script():
-        pass
+Dependencies and products can be added as with a normal pytask task with the
+``@pytask.mark.depends_on`` and ``@pytask.mark.produces`` decorators. which is explained
+in this `tutorial
+<https://pytask-dev.readthedocs.io/en/stable/tutorials/defining_dependencies_products.html>`_.
 
 
-    # or
+Accessing dependencies and products in the script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-    @pytask.mark.julia
-    @pytask.mark.depends_on({0: "script.jl", "input": "input.csv"})
-    def task_run_jl_script():
-        pass
-
-
-    # or two decorators for the function, if you do not assign a name to the input.
-
-
-    @pytask.mark.julia
-    @pytask.mark.depends_on({"source": "script.jl"})
-    @pytask.mark.depends_on("input.csv")
-    def task_run_jl_script():
-        pass
-
-
-Command Line Arguments
-~~~~~~~~~~~~~~~~~~~~~~
-
-The decorator can be used to pass command line arguments to ``julia``. An important
-detail is that you need to differentiate between options passed to the Julia executable
-and arguments passed to the script.
-
-First, pass options to the executable, then, use ``"--"`` as a separator, and after that
-arguments to the script. Provide all arguments in a tuple or a list as below.
-
-The following shows how to pass both with the decorator.
-
-.. code-block:: python
-
-    @pytask.mark.julia(("--threads", "2", "--", "value"))
-    @pytask.mark.depends_on("script.jl")
-    @pytask.mark.produces("out.csv")
-    def task_run_jl_script():
-        pass
-
-which executes the something similar to the following on the command line.
-
-.. code-block:: console
-
-    $ julia --threads 2 -- value
-
-And in your ``script.jl``, you can intercept the value with
-
-.. code-block:: Julia
-
-    arg = ARGS[1]  # holds ``"value"``
-
-If you pass only of of them, either options for the executable or arguments to the
-script, you still need to include the separator.
-
-.. code-block:: python
-
-    @pytask.mark.julia(("--verbose", "--"))  # for options for the executable.
-    @pytask.mark.depends_on("script.jl")
-    def task_func():
-        ...
-
-
-    @pytask.mark.julia(("--", "value"))  # for arguments for the script.
-    @pytask.mark.depends_on("script.jl")
-    def task_func():
-        ...
-
-The corresponding commands on the command line are
-
-.. code-block:: console
-
-    $ julia --verbose -- script.jl
-
-    $ julia -- script.jl value
-
-
-Parametrization
-~~~~~~~~~~~~~~~
-
-You can also parametrize the execution of scripts, meaning executing multiple Julia
-scripts as well as passing different command line arguments to the same Julia script.
-
-The following task executes two Julia scripts which produce different outputs.
-
-.. code-block:: python
-
-    from src.config import BLD, SRC
-
-
-    @pytask.mark.julia
-    @pytask.mark.parametrize(
-        "depends_on, produces",
-        [(SRC / "script_1.jl", BLD / "1.csv"), (SRC / "script_2.jl", BLD / "2.csv")],
-    )
-    def task_execute_julia_script():
-        pass
-
-And the Julia script includes something like
+To access the paths of dependencies and products in the script, pytask-julia stores the
+information by default in a ``.json`` file. The path to this file is passed as a
+positional argument to the script. Inside the script, you can read the information.
 
 .. code-block:: julia
 
-    produces = ARGS[1]  # holds the path
+    import JSON
 
-If you want to pass different command line arguments to the same Julia script, you
-have to include the ``@pytask.mark.julia`` decorator in the parametrization just like
-with ``@pytask.mark.depends_on`` and ``@pytask.mark.produces``.
+    path_to_json = ARGS[1]  # Contains the path to the .json file.
 
-.. code-block:: python
+    config = JSON.parse(read(path_to_json, String))  # A dictionary.
 
-    @pytask.mark.depends_on("script.jl")
-    @pytask.mark.parametrize(
-        "produces, julia",
-        [
-            (BLD / "output_1.csv", ("--", "1")),
-            (BLD / "output_2.csv", ("--", "2")),
-        ],
-    )
-    def task_execute_julia_script():
-        pass
+    config["produces"]  # Is the path to the output file "../out.csv".
 
 
-Configuration
--------------
+Managing Julia environments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want to change the name of the key which identifies the Julia script, change the
-following default configuration in your pytask configuration file.
+Julia has support for environments to execute your tasks via ``Pkg.jl`` which is
+explained `here <https://pkgdocs.julialang.org/v1/environments/>`_.
+
+pytask-julia allows you define a default environment via your `pytask configuration file
+<https://pytask-dev.readthedocs.io/en/stable/tutorials/configuration.html>`_.
+
+Use the ``julia_project`` key to define an absolute path or a path relative to your
+configuration file to point to your environment.
+
+Probably your environment files ``Manifest.toml`` and ``Project.toml`` reside at the
+root of your project folder as well as your pytask configuration file. Then, the content
+will look like this.
 
 .. code-block:: ini
 
-    julia_source_key = source
+    [pytask]
+    julia_project = .
+
+
+You can also define environments for each task which will overwrite any other default
+with the ``project`` keyword argument. Pass an absolute path or a path relative to the
+task module.
+
+.. code-block:: python
+
+    @pytask.mark.julia(script="script.jl", project=".")
+    @pytask.mark.produces("out.csv")
+    def task_run_jl_script():
+        pass
+
+
+Command Line Options
+~~~~~~~~~~~~~~~~~~~~
+
+Command line options can be pass via the ``options`` keyword argument.
+
+.. code-block:: python
+
+    @pytask.mark.julia(script="script.jl", options=["--threads", "2"])
+    @pytask.mark.produces("out.csv")
+    def task_run_jl_script():
+        pass
+
+This example will execute the script using to threads.
+
+
+Repeating tasks with different scripts or inputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also repeat the execution of tasks, meaning executing multiple Julia scripts or
+passing different command line arguments to the same Julia script.
+
+The following task executes two Julia scripts, ``script_1.jl`` and ``script_2.jl``,
+which produce different outputs.
+
+.. code-block:: python
+
+    for i in range(2):
+
+        @pytask.mark.task
+        @pytask.mark.julia(script=f"script_{i}.jl")
+        @pytask.mark.produces(f"out_{i}.csv")
+        def task_execute_julia_script():
+            pass
+
+If you want to pass different inputs to the same Julia script, pass these arguments with
+the ``kwargs`` keyword of the ``@pytask.mark.task`` decorator.
+
+.. code-block:: python
+
+    for i in range(2):
+
+        @pytask.mark.task(kwargs={"i": i})
+        @pytask.mark.julia(script="script.jl")
+        @pytask.mark.produces(f"output_{i}.csv")
+        def task_execute_julia_script():
+            pass
+
+and inside the task access the argument ``i`` with
+
+.. code-block:: julia
+
+    import JSON
+
+    path_to_json = ARGS[1]  # Contains the path to the .json file.
+
+    config = JSON.parse(read(path_to_json, String))  # A dictionary.
+
+    config["produces"]  # Is the path to the output file "../output_{i}.csv".
+
+    config["i"]  # Is the number.
+
+
+Custom serializers
+~~~~~~~~~~~~~~~~~~
 
 
 Implementation Details
