@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
+import tomli_w
 from pytask import Task
 
 
@@ -13,15 +14,9 @@ _HIDDEN_FOLDER = ".pytask"
 
 
 SERIALIZER = {
+    "toml": {"serializer": tomli_w.dumps, "suffix": ".toml"},
     "json": {"serializer": json.dumps, "suffix": ".json"},
 }
-
-try:
-    import tomli_w
-except ImportError:
-    pass
-else:
-    SERIALIZER["toml"] = {"serializer": tomli_w.dumps, "suffix": ".toml"}
 
 try:
     import yaml

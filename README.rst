@@ -98,16 +98,16 @@ Accessing dependencies and products in the script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To access the paths of dependencies and products in the script, pytask-julia stores the
-information by default in a ``.json`` file. The path to this file is passed as a
+information by default in a ``.toml`` file. The path to this file is passed as a
 positional argument to the script. Inside the script, you can read the information.
 
 .. code-block:: julia
 
-    import JSON
+    import TOML
 
-    path_to_json = ARGS[1]  # Contains the path to the .json file.
+    path_to_toml = ARGS[1]  # Contains the path to the .toml file.
 
-    config = JSON.parse(read(path_to_json, String))  # A dictionary.
+    config = TOML.parsefile(path_to_toml)  # A dictionary.
 
     config["produces"]  # Is the path to the output file "../out.csv".
 
@@ -197,38 +197,61 @@ and inside the task access the argument ``i`` with
 
 .. code-block:: julia
 
-    import JSON
+    import TOML
 
-    path_to_json = ARGS[1]  # Contains the path to the .json file.
+    path_to_toml = ARGS[1]  # Contains the path to the .toml file.
 
-    config = JSON.parse(read(path_to_json, String))  # A dictionary.
+    config = TOML.parsefile(path_to_toml)  # A dictionary.
 
     config["produces"]  # Is the path to the output file "../output_{i}.csv".
 
     config["i"]  # Is the number.
 
 
-Custom serializers
-~~~~~~~~~~~~~~~~~~
+Serializers
+~~~~~~~~~~~
 
+You can also serialize your data with any other tool you like. By default, pytask-julia
+also support JSON and YAML (if PyYaml is installed).
 
-Implementation Details
-----------------------
-
-The plugin is a convenient wrapper around
+Use the ``serializer`` keyword arguments of the ``@pytask.mark.julia`` decorator with
 
 .. code-block:: python
 
-    import subprocess
+    @pytask.mark.julia(script="script.jl", serializer="json")
+    def task_example():
+        ...
 
-    subprocess.run(["julia", "script.jl"], check=True)
 
-to which you can always resort to when the plugin does not deliver functionality you
-need.
+    @pytask.mark.julia(script="script.jl", serializer="yaml")
+    def task_example():
+        ...
 
-It is not possible to enter a post-mortem debugger when an error happens in the Julia
-script or enter the debugger when starting the script. If there exists a solution for
-that, hints as well as contributions are highly appreciated.
+And in your Julia script use one of these
+
+.. code-block:: julia
+
+    import JSON
+    config = JSON.parse(read(ARGS[1], String))
+
+    import YAML
+    config = YAML.load_file(ARGS[1])
+
+Note that both packages, ``JSON`` and ``YAML``, need to be installed.
+
+If you need a custom serializer, you can also provide any callable to ``serializer``
+which transforms data to a string. Use ``suffix`` to set the correct file ending.
+
+Here is a replication of the JSON example.
+
+.. code-block:: python
+
+    import json
+
+
+    @pytask.mark.julia(script="script.jl", serializer=json.dumps, suffix=".json")
+    def task_example():
+        ...
 
 
 Changes
