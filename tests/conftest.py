@@ -15,6 +15,16 @@ needs_julia = pytest.mark.skipif(
 )
 
 
+parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
+    "parse_config_code, serializer, suffix",
+    [
+        ("import TOML; config = TOML.parsefile(ARGS[1])", "toml", ".toml"),
+        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
+        ("import YAML; config = YAML.load_file(ARGS[1])", "yaml", ".yaml"),
+    ],
+)
+
+
 @pytest.fixture()
 def runner():
     return CliRunner()

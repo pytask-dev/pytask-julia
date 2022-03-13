@@ -14,6 +14,10 @@ dependencies:
   - julia
   - pytask >=0.1
   - pytask-parallel >=0.1
+  - tomli_w
+
+  # Optional package dependencies
+  - pyyaml
 
   # Misc
   - black

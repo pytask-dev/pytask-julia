@@ -17,6 +17,13 @@ SERIALIZER = {
 }
 
 try:
+    import tomli_w
+except ImportError:
+    pass
+else:
+    SERIALIZER["toml"] = {"serializer": tomli_w.dumps, "suffix": ".toml"}
+
+try:
     import yaml
 except ImportError:
     pass

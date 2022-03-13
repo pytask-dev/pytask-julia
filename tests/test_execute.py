@@ -11,6 +11,7 @@ from pytask import Task
 from pytask_julia.execute import pytask_execute_task_setup
 
 from tests.conftest import needs_julia
+from tests.conftest import parametrize_parse_code_serializer_suffix
 from tests.conftest import ROOT
 
 
@@ -34,13 +35,7 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 
 @needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize(
-    "parse_config_code, serializer, suffix",
-    [
-        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
-        ("import YAML; config = YAML.load_file(ARGS[1])", "yaml", ".yaml"),
-    ],
-)
+@parametrize_parse_code_serializer_suffix
 def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
     task_source = f"""
     import pytask
@@ -72,14 +67,9 @@ def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
     ).exists()
 
 
+@needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize(
-    "parse_config_code, serializer, suffix",
-    [
-        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
-        ("import YAML; config = YAML.load_file(ARGS[1])", "yaml", ".yaml"),
-    ],
-)
+@parametrize_parse_code_serializer_suffix
 def test_raise_error_if_julia_is_not_found(
     tmp_path, monkeypatch, parse_config_code, serializer, suffix
 ):
@@ -120,19 +110,19 @@ def test_raise_error_if_julia_is_not_found(
 
 @needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize(
-    "parse_config_code",
-    [
-        "import JSON; config = JSON.parse(read(ARGS[1], String))",
-        "import YAML; config = YAML.load_file(ARGS[1])",
-    ],
-)
-def test_run_jl_script_w_wrong_cmd_option(runner, tmp_path, parse_config_code):
+@parametrize_parse_code_serializer_suffix
+def test_run_jl_script_w_wrong_cmd_option(
+    runner, tmp_path, parse_config_code, serializer, suffix
+):
     task_source = f"""
     import pytask
 
     @pytask.mark.julia(
-        script="script.jl", options=("--wrong-flag"), project="{ROOT.as_posix()}"
+        script="script.jl",
+        options=("--wrong-flag"),
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{ROOT.as_posix()}",
     )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
@@ -156,20 +146,18 @@ def test_run_jl_script_w_wrong_cmd_option(runner, tmp_path, parse_config_code):
 @needs_julia
 @pytest.mark.end_to_end
 @pytest.mark.parametrize("n_threads", [2, 3])
-@pytest.mark.parametrize(
-    "parse_config_code",
-    [
-        "import JSON; config = JSON.parse(read(ARGS[1], String))",
-        "import YAML; config = YAML.load_file(ARGS[1])",
-    ],
-)
-def test_check_passing_cmd_line_options(runner, tmp_path, n_threads, parse_config_code):
+@parametrize_parse_code_serializer_suffix
+def test_check_passing_cmd_line_options(
+    runner, tmp_path, n_threads, parse_config_code, serializer, suffix
+):
     task_source = f"""
     import pytask
 
     @pytask.mark.julia(
         script="script.jl",
         options=("--threads", "{n_threads}"),
+        serializer="{serializer}",
+        suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
     @pytask.mark.produces("out.txt")
@@ -192,20 +180,18 @@ def test_check_passing_cmd_line_options(runner, tmp_path, n_threads, parse_confi
 
 @needs_julia
 @pytest.mark.end_to_end
-@pytest.mark.parametrize(
-    "parse_config_code, serializer, suffix",
-    [
-        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
-        ("import YAML; config = YAML.load_file(ARGS[1])", "yaml", ".yaml"),
-    ],
-)
+@parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_environment_in_config(
     runner, tmp_path, parse_config_code, serializer, suffix
 ):
     task_source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", serializer="{serializer}")
+    @pytask.mark.julia(
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+    )
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
