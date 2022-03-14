@@ -8,7 +8,7 @@ from typing import Sequence
 
 def julia(
     *,
-    script: str | Path = None,
+    script: str | Path | None = None,
     options: str | Iterable[str] | None = None,
     serializer: str | Callable[..., str] | str | None = None,
     suffix: str | None = None,

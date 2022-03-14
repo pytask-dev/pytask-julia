@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from pytask import cli
+from pytask import ExitCode
 from pytask import main
 from pytask import Mark
 from pytask import Task
@@ -60,7 +61,7 @@ def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
     assert tmp_path.joinpath(
         ".pytask", "task_dummy_py_task_run_jl_script" + suffix
@@ -139,7 +140,7 @@ def test_run_jl_script_w_wrong_cmd_option(
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert result.exit_code == 1
+    assert result.exit_code == ExitCode.FAILED
     assert "--wrong-flag" in result.output
 
 
@@ -175,7 +176,7 @@ def test_check_passing_cmd_line_options(
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
 
 
 @needs_julia
@@ -213,7 +214,7 @@ def test_run_jl_script_w_environment_in_config(
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
     assert tmp_path.joinpath(
         ".pytask", "task_dummy_py_task_run_jl_script" + suffix

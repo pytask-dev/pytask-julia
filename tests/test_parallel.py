@@ -6,6 +6,7 @@ import time
 
 import pytest
 from pytask import cli
+from pytask import ExitCode
 
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
@@ -81,7 +82,7 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
     for name in ["1.csv", "2.csv"]:
@@ -89,7 +90,7 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix(), "-n", 2])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_parallel = time.time() - start
 
     assert duration_parallel < duration_normal
@@ -140,7 +141,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
     for name in ["1.csv", "2.csv"]:
@@ -148,7 +149,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix(), "-n", 2])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_parallel = time.time() - start
 
     assert duration_parallel < duration_normal
@@ -189,7 +190,7 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
     for name in ["0.csv", "1.csv"]:
@@ -197,7 +198,7 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix(), "-n", 2])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_parallel = time.time() - start
 
     assert duration_parallel < duration_normal
@@ -241,7 +242,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
     for name in ["0.csv", "1.csv"]:
@@ -249,7 +250,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
 
     start = time.time()
     result = runner.invoke(cli, [tmp_path.as_posix(), "-n", 2])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
     duration_parallel = time.time() - start
 
     assert duration_parallel < duration_normal

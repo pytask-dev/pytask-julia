@@ -4,6 +4,7 @@ import textwrap
 
 import pytest
 from pytask import cli
+from pytask import ExitCode
 
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
@@ -54,7 +55,7 @@ def test_parametrized_execution_of_jl_script(
         tmp_path.joinpath(name).write_text(textwrap.dedent(julia_script))
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
 
 
 @needs_julia
@@ -101,4 +102,4 @@ def test_parametrize_jl_options_and_product_paths(
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK
