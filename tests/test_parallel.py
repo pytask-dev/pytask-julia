@@ -9,6 +9,7 @@ from pytask import cli
 
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
+from tests.conftest import ROOT
 
 try:
     import pytask_parallel  # noqa: F401
@@ -42,7 +43,8 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
             {{
                 "script": "script_1.jl",
                 "serializer": "{serializer}",
-                suffix="{suffix}"
+                "suffix": "{suffix}",
+                "project": "{ROOT.as_posix()}",
             }},
             "1",
             "1.csv"
@@ -51,7 +53,8 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
             {{
                 "script": "script_2.jl",
                 "serializer": "{serializer}",
-                suffix="{suffix}"
+                "suffix": "{suffix}",
+                "project": "{ROOT.as_posix()}",
             }},
             "2",
             "2.csv"
@@ -108,29 +111,12 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
     for i in range(1, 3):
 
-        @pytask.mark.parametrize("julia, content, produces", [
-            (
-                {{
-                    "script": "script_1.jl",
-                    "serializer": "{serializer}",
-                    "suffix": "{suffix}"
-                }},
-                "1",
-                "1.csv"
-            ),
-            (
-                {{
-                    "script": "script_2.jl",
-                    "serializer": "{serializer}",
-                    "suffix": "{suffix}"
-                }},
-                "2",
-                "2.csv"
-            ),
-        ])
         @pytask.mark.task(kwargs={{"content": i}})
         @pytask.mark.julia(
-            script=f"script_{{i}}.jl", serializer="{serializer}", suffix="{suffix}"
+            script=f"script_{{i}}.jl",
+            serializer="{serializer}",
+            suffix="{suffix}",
+            project="{ROOT.as_posix()}",
         )
         @pytask.mark.produces(f"{{i}}.csv")
         def task_execute_julia():
@@ -182,10 +168,13 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
     source = f"""
     import pytask
 
-    @pytask.mark.julia(script="script.jl", serializer="{serializer}", suffix="{suffix}")
-    @pytask.mark.parametrize("produces, number", [
-        (SRC / "0.csv", 1), (SRC / "1.csv", 2),
-    ])
+    @pytask.mark.julia(
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{ROOT.as_posix()}",
+    )
+    @pytask.mark.parametrize("produces, number", [("0.csv", 1), ("1.csv", 2)])
     def task_execute_julia_script():
         pass
     """
@@ -228,11 +217,14 @@ def test_parallel_parametrization_over_source_file_w_loop(
     source = f"""
     import pytask
 
-    for i in range(1, 3):
+    for i in range(2):
 
         @pytask.mark.task(kwargs={{"number": i}})
         @pytask.mark.julia(
-            script="script.jl", serializer="{serializer}", suffix="{suffix}"
+            script="script.jl",
+            serializer="{serializer}",
+            suffix="{suffix}",
+            project="{ROOT.as_posix()}",
         )
         @pytask.mark.produces(f"{{i}}.csv")
         def task_execute_julia_script():
