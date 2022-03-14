@@ -105,7 +105,7 @@ def test_raise_error_if_julia_is_not_found(
 
     session = main({"paths": tmp_path})
 
-    assert session.exit_code == 1
+    assert session.exit_code == ExitCode.FAILED
     assert isinstance(session.execution_reports[0].exc_info[1], RuntimeError)
 
 
