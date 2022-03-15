@@ -88,7 +88,7 @@ more information.
 Dependencies and Products
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Dependencies and products can be added as with a normal pytask task with the
+Dependencies and products can be added as with a normal pytask task using the
 ``@pytask.mark.depends_on`` and ``@pytask.mark.produces`` decorators. which is explained
 in this `tutorial
 <https://pytask-dev.readthedocs.io/en/stable/tutorials/defining_dependencies_products.html>`_.
