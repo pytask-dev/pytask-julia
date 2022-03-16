@@ -17,17 +17,17 @@ from pytask_julia.shared import julia
 @hookimpl
 def pytask_execute_task_setup(task):
     """Check whether environment allows executing Julia files."""
-    markers = get_marks(task, "julia")
-    if markers:
+    marks = get_marks(task, "julia")
+    if marks:
         if shutil.which("julia") is None:
             raise RuntimeError(
                 "julia is needed to run Julia scripts, but it is not found on your "
                 "PATH."
             )
 
-        if len(markers) != 1:
+        if len(marks) != 1:
             raise ValueError("There should only one Julia marker.")
-        marker = markers[0]
+        marker = marks[0]
 
         _, _, serializer, suffix, _ = julia(**marker.kwargs)
 

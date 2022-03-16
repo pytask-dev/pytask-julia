@@ -71,6 +71,41 @@ def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
 @needs_julia
 @pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
+def test_run_jl_script_w_task_decorator(
+    runner, tmp_path, parse_config_code, serializer, suffix
+):
+    task_source = f"""
+    import pytask
+
+    @pytask.mark.task
+    @pytask.mark.julia(
+        script="script.jl", serializer="{serializer}", project="{ROOT.as_posix()}"
+    )
+    @pytask.mark.produces("out.txt")
+    def run_jl_script():
+        pass
+    """
+    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+
+    julia_script = f"""
+    {parse_config_code}
+    write(
+        config["produces"],
+        "Crying helps me to slow down and obsess over the weight of life's problems."
+    )
+    """
+    tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
+
+    result = runner.invoke(cli, [tmp_path.as_posix()])
+
+    assert result.exit_code == ExitCode.OK
+    assert tmp_path.joinpath("out.txt").exists()
+    assert tmp_path.joinpath(".pytask", "task_dummy_py_run_jl_script" + suffix).exists()
+
+
+@needs_julia
+@pytest.mark.end_to_end
+@parametrize_parse_code_serializer_suffix
 def test_raise_error_if_julia_is_not_found(
     tmp_path, monkeypatch, parse_config_code, serializer, suffix
 ):

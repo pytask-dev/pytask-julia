@@ -20,22 +20,24 @@ def julia(
     str | None,
     str | Path | None,
 ]:
-    """Specify command line options for Julia.
+    """Parse input to the ``@pytask.mark.julia`` decorator.
 
     Parameters
     ----------
-    script : Union[str, Path]
+    script : str | Path
         The path to the Julia script which is executed.
-    options : Optional[Union[str, Iterable[str]]]
+    options : str | Iterable[str] | None
         One or multiple command line options passed to the interpreter for Julia.
-    serializer: Optional[Callable[Any, str]]
+    serializer : Callable[Any, str] | None
         A function to serialize data for the task which accepts a dictionary with all
         the information. If the value is `None`, use either the value specified in the
-        configuration file under ``julia_serializer`` or fall back to ``"json"``.
-    suffix: Optional[str]
+        configuration file under ``julia_serializer`` or fall back to ``"toml"``.
+    suffix : str | None
         A suffix for the serialized file. If the value is `None`, use either the value
         specified in the configuration file under ``julia_suffix`` or fall back to
-        ``".json"``.
+        ``".toml"``.
+    project : str | Path | None
+        A path to an Julia environment used to execute this task.
 
     """
     options = [] if options is None else list(map(str, _to_list(options)))

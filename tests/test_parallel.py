@@ -9,7 +9,6 @@ from pytask import cli
 from pytask import ExitCode
 
 from tests.conftest import needs_julia
-from tests.conftest import parametrize_parse_code_serializer_suffix
 from tests.conftest import ROOT
 
 try:
@@ -22,6 +21,14 @@ else:
 
 pytestmark = pytest.mark.skipif(
     not _IS_PYTASK_PARALLEL_INSTALLED, reason="Tests require pytask-parallel."
+)
+
+
+parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
+    "parse_config_code, serializer, suffix",
+    [
+        ("import TOML; config = TOML.parsefile(ARGS[1])", "toml", ".toml"),
+    ],
 )
 
 

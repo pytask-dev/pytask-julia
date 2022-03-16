@@ -29,9 +29,9 @@ def run_jl_script(
     script: Path, options: list[str], serialized: Path, project: list[str]
 ) -> None:
     """Run a Julia script."""
-    args = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
-    print("Executing " + " ".join(args) + ".")  # noqa: T001
-    subprocess.run(args, check=True)
+    cmd = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
+    print("Executing " + " ".join(cmd) + ".")  # noqa: T001
+    subprocess.run(cmd, check=True)
 
 
 _ERROR_MSG_MISSING_SCRIPT = (
@@ -54,23 +54,25 @@ def pytask_collect_task(session, path, name, obj):
     """
     __tracebackhide__ = True
 
-    if name.startswith("task_") and callable(obj) and has_mark(obj, "julia"):
+    if (
+        (name.startswith("task_") or has_mark(obj, "task"))
+        and callable(obj)
+        and has_mark(obj, "julia")
+    ):
         obj, markers = remove_marks(obj, "julia")
-        julia_marker = _merge_all_markers(
+        julia_mark = _merge_all_markers(
             markers=markers,
             default_options=session.config["julia_options"],
             default_serializer=session.config["julia_serializer"],
             default_suffix=session.config["julia_suffix"],
             default_project=session.config["julia_project"],
         )
-        script, options, _, _, project = julia(**julia_marker.kwargs)
+        script, options, _, _, project = julia(**julia_mark.kwargs)
 
         if script is None:
             raise ValueError(_ERROR_MSG_MISSING_SCRIPT.format(name=name, path=path))
 
-        parsed_project = parse_project(project, session.config["root"])
-
-        obj.pytask_meta.markers.append(julia_marker)
+        obj.pytask_meta.markers.append(julia_mark)
 
         dependencies = parse_nodes(session, path, name, obj, depends_on)
         products = parse_nodes(session, path, name, obj, produces)
@@ -98,6 +100,8 @@ def pytask_collect_task(session, path, name, obj):
         else:
             task.depends_on = {0: task.depends_on, "__script": script_node}
             task.attributes["julia_keep_dict"] = False
+
+        parsed_project = parse_project(project, session.config["root"])
 
         task.function = functools.partial(
             task.function,
@@ -144,7 +148,6 @@ def _merge_all_markers(
     kwargs["suffix"] = next(
         (v["suffix"] for v in values if v["suffix"] is not None), proposed_suffix
     )
-
     mark = Mark("julia", (), kwargs)
     return mark
 
