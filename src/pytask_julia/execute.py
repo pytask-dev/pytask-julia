@@ -25,11 +25,9 @@ def pytask_execute_task_setup(task):
                 "PATH."
             )
 
-        if len(marks) != 1:
-            raise ValueError("There should only one Julia marker.")
-        marker = marks[0]
+        assert len(marks) == 1
 
-        _, _, serializer, suffix, _ = julia(**marker.kwargs)
+        _, _, serializer, suffix, _ = julia(**marks[0].kwargs)
 
         path_to_serialized = create_path_to_serialized(task, suffix)
         path_to_serialized.parent.mkdir(parents=True, exist_ok=True)

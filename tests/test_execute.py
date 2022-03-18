@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import textwrap
 from pathlib import Path
 
@@ -33,21 +34,31 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 @needs_julia
 @pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
-def test_run_jl_script(runner, tmp_path, parse_config_code, serializer, suffix):
+@pytest.mark.parametrize("depends_on", ["'in_1.txt'", "['in_1.txt', 'in_2.txt']"])
+def test_run_jl_script(
+    runner, tmp_path, parse_config_code, serializer, suffix, depends_on
+):
     task_source = f"""
     import pytask
 
     @pytask.mark.julia(
         script="script.jl", serializer="{serializer}", project="{ROOT.as_posix()}"
     )
+    @pytask.mark.depends_on({depends_on})
     @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("in_1.txt").touch()
+    tmp_path.joinpath("in_2.txt").touch()
 
     julia_script = f"""
     {parse_config_code}
+    if length(config["depends_on"]) > 0
+    else
+        throw(DomainError("No dependencies"))
+    end
     write(
         config["produces"],
         "Crying helps me to slow down and obsess over the weight of life's problems."
@@ -213,8 +224,9 @@ def test_check_passing_cmd_line_options(
 @needs_julia
 @pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
+@pytest.mark.parametrize("path", [ROOT, "relative_from_config"])
 def test_run_jl_script_w_environment_in_config(
-    runner, tmp_path, parse_config_code, serializer, suffix
+    runner, tmp_path, parse_config_code, serializer, suffix, path
 ):
     task_source = f"""
     import pytask
@@ -239,8 +251,12 @@ def test_run_jl_script_w_environment_in_config(
     """
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
+    if isinstance(path, Path):
+        path_in_config = path.as_posix()
+    else:
+        path_in_config = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
     tmp_path.joinpath("pytask.ini").write_text(
-        f"[pytask]\njulia_project={ROOT.as_posix()}"
+        f"[pytask]\njulia_project={path_in_config}"
     )
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
@@ -250,3 +266,99 @@ def test_run_jl_script_w_environment_in_config(
     assert tmp_path.joinpath(
         ".pytask", "task_dummy_py_task_run_jl_script" + suffix
     ).exists()
+
+
+@needs_julia
+@pytest.mark.end_to_end
+@parametrize_parse_code_serializer_suffix
+def test_run_jl_script_w_environment_relative_to_task(
+    runner, tmp_path, parse_config_code, serializer, suffix
+):
+    project_in_task = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
+
+    task_source = f"""
+    import pytask
+
+    @pytask.mark.julia(
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{project_in_task}",
+    )
+    @pytask.mark.produces("out.txt")
+    def task_run_jl_script():
+        pass
+    """
+    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+
+    julia_script = f"""
+    {parse_config_code}
+    write(
+        config["produces"],
+        "Crying helps me to slow down and obsess over the weight of life's problems."
+    )
+    """
+    tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
+
+    result = runner.invoke(cli, [tmp_path.as_posix()])
+
+    assert result.exit_code == ExitCode.OK
+    assert tmp_path.joinpath("out.txt").exists()
+    assert tmp_path.joinpath(
+        ".pytask", "task_dummy_py_task_run_jl_script" + suffix
+    ).exists()
+
+
+@needs_julia
+@pytest.mark.end_to_end
+def test_run_jl_script_w_custom_serializer(runner, tmp_path):
+    task_source = f"""
+    import pytask
+    import json
+
+    @pytask.mark.julia(
+        script="script.jl",
+        serializer=json.dumps,
+        project="{ROOT.as_posix()}",
+    )
+    @pytask.mark.produces("out.txt")
+    def task_run_jl_script():
+        pass
+    """
+    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+
+    julia_script = """
+    import JSON; config = JSON.parse(read(ARGS[1], String))
+    write(
+        config["produces"],
+        "Crying helps me to slow down and obsess over the weight of life's problems."
+    )
+    """
+    tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
+
+    result = runner.invoke(cli, [tmp_path.as_posix()])
+
+    assert result.exit_code == ExitCode.OK
+    assert tmp_path.joinpath("out.txt").exists()
+    assert tmp_path.joinpath(".pytask", "task_dummy_py_task_run_jl_script").exists()
+
+
+@needs_julia
+@pytest.mark.end_to_end
+def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
+    task_source = """
+    import pytask
+
+    @pytask.mark.julia(script="script.jl")
+    @pytask.mark.julia(script="script.jl")
+    @pytask.mark.produces("out.txt")
+    def task_run_jl_script():
+        pass
+    """
+    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("script.jl").touch()
+
+    result = runner.invoke(cli, [tmp_path.as_posix()])
+
+    assert result.exit_code == ExitCode.COLLECTION_FAILED
+    assert "has multiple @pytask.mark.julia marks" in result.output

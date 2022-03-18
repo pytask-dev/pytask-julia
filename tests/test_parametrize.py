@@ -13,7 +13,7 @@ from tests.conftest import ROOT
 parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
     "parse_config_code, serializer, suffix",
     [
-        ("import TOML; config = TOML.parsefile(ARGS[1])", "toml", ".toml"),
+        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
     ],
 )
 

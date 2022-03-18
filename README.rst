@@ -98,18 +98,23 @@ Accessing dependencies and products in the script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To access the paths of dependencies and products in the script, pytask-julia stores the
-information by default in a ``.toml`` file. The path to this file is passed as a
+information by default in a ``.json`` file. The path to this file is passed as a
 positional argument to the script. Inside the script, you can read the information.
 
 .. code-block:: julia
 
-    import TOML
+    import JSON
 
-    path_to_toml = ARGS[1]  # Contains the path to the .toml file.
+    path_to_json = ARGS[1]  # Contains the path to the .json file.
 
-    config = TOML.parsefile(path_to_toml)  # A dictionary.
+    config = JSON.parse(read(path_to_json, String))  # A dictionary.
 
     config["produces"]  # Is the path to the output file "../out.csv".
+
+The ``.json`` file is stored in the same folder as the task in a ``.pytask`` directory.
+
+To parse the JSON file, you need to install `JSON.jl
+<https://github.com/JuliaIO/JSON.jl>`_.
 
 
 Managing Julia environments
@@ -197,11 +202,11 @@ and inside the task access the argument ``i`` with
 
 .. code-block:: julia
 
-    import TOML
+    import JSON
 
-    path_to_toml = ARGS[1]  # Contains the path to the .toml file.
+    path_to_json = ARGS[1]  # Contains the path to the .json file.
 
-    config = TOML.parsefile(path_to_toml)  # A dictionary.
+    config = JSON.parse(read(path_to_json, String))  # A dictionary.
 
     config["produces"]  # Is the path to the output file "../output_{i}.csv".
 
@@ -212,32 +217,24 @@ Serializers
 ~~~~~~~~~~~
 
 You can also serialize your data with any other tool you like. By default, pytask-julia
-also support JSON and YAML (if PyYaml is installed).
+also supports YAML (if PyYaml is installed).
 
 Use the ``serializer`` keyword arguments of the ``@pytask.mark.julia`` decorator with
 
 .. code-block:: python
 
-    @pytask.mark.julia(script="script.jl", serializer="json")
-    def task_example():
-        ...
-
-
     @pytask.mark.julia(script="script.jl", serializer="yaml")
     def task_example():
         ...
 
-And in your Julia script use one of these
+And in your Julia script use
 
 .. code-block:: julia
-
-    import JSON
-    config = JSON.parse(read(ARGS[1], String))
 
     import YAML
     config = YAML.load_file(ARGS[1])
 
-Note that both packages, ``JSON`` and ``YAML``, need to be installed.
+Note that the ``YAML`` package needs to be installed.
 
 If you need a custom serializer, you can also provide any callable to ``serializer``
 which transforms data to a string. Use ``suffix`` to set the correct file ending.

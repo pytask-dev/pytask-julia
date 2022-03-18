@@ -1,5 +1,6 @@
 prune tests
 
+exclude .coveragerc
 exclude *.ini
 exclude *.rst
 exclude *.toml

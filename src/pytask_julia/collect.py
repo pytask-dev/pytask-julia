@@ -16,7 +16,7 @@ from pytask import remove_marks
 from pytask import Task
 from pytask_julia.serialization import SERIALIZER
 from pytask_julia.shared import julia
-from pytask_julia.shared import parse_project
+from pytask_julia.shared import parse_relative_path
 
 
 _SEPARATOR: str = "--"
@@ -94,7 +94,7 @@ def pytask_collect_task(session, path, name, obj):
             task.depends_on = {0: task.depends_on, "__script": script_node}
             task.attributes["julia_keep_dict"] = False
 
-        parsed_project = parse_project(project, session.config["root"])
+        parsed_project = _parse_project(project, task.path.parent)
 
         task.function = functools.partial(
             task.function,
@@ -117,7 +117,6 @@ def _parse_julia_mark(
         ("script", script, None),
         ("options", options, default_options),
         ("serializer", serializer, default_serializer),
-        ("project", project, default_project),
     ]:
         parsed_kwargs[arg_name] = value if value else default
 
@@ -129,6 +128,11 @@ def _parse_julia_mark(
     else:
         proposed_suffix = default_suffix
     parsed_kwargs["suffix"] = suffix if suffix else proposed_suffix
+
+    if isinstance(project, (str, Path)):
+        parsed_kwargs["project"] = project
+    else:
+        parsed_kwargs["project"] = default_project
 
     mark = Mark("julia", (), parsed_kwargs)
     return mark
@@ -157,3 +161,10 @@ def _copy_func(func: types.FunctionType) -> types.FunctionType:
     new_func = functools.update_wrapper(new_func, func)
     new_func.__kwdefaults__ = func.__kwdefaults__
     return new_func
+
+
+def _parse_project(project: str | Path | None, root: Path) -> list[str]:
+    if project is None:
+        return []
+    project = parse_relative_path(project, root)
+    return ["--project=" + project.as_posix()]

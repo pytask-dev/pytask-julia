@@ -13,7 +13,7 @@ from tests.conftest import ROOT
 
 try:
     import pytask_parallel  # noqa: F401
-except ImportError:
+except ImportError:  # pragma: no cover
     _IS_PYTASK_PARALLEL_INSTALLED = False
 else:
     _IS_PYTASK_PARALLEL_INSTALLED = True
@@ -27,7 +27,7 @@ pytestmark = pytest.mark.skipif(
 parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
     "parse_config_code, serializer, suffix",
     [
-        ("import TOML; config = TOML.parsefile(ARGS[1])", "toml", ".toml"),
+        ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
     ],
 )
 

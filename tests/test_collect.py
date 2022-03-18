@@ -5,7 +5,10 @@ from contextlib import ExitStack as does_not_raise  # noqa: N813
 import pytest
 from _pytask.mark import Mark
 from pytask_julia.collect import _parse_julia_mark
+from pytask_julia.collect import _parse_project
 from pytask_julia.collect import SERIALIZER
+
+from tests.conftest import ROOT
 
 
 @pytest.mark.unit
@@ -103,3 +106,14 @@ def test_parse_julia_mark(
             mark, default_options, default_serializer, default_suffix, default_project
         )
         assert out == expected
+
+
+@pytest.mark.parametrize(
+    "project, root, expected",
+    [
+        (None, ROOT, []),
+    ],
+)
+def test_parse_project(project, root, expected):
+    result = _parse_project(project, root)
+    assert result == expected

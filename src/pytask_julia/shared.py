@@ -66,11 +66,11 @@ def julia(
     serializer : Callable[Any, str] | None
         A function to serialize data for the task which accepts a dictionary with all
         the information. If the value is `None`, use either the value specified in the
-        configuration file under ``julia_serializer`` or fall back to ``"toml"``.
+        configuration file under ``julia_serializer`` or fall back to ``"json"``.
     suffix : str | None
         A suffix for the serialized file. If the value is `None`, use either the value
         specified in the configuration file under ``julia_suffix`` or fall back to
-        ``".toml"``.
+        ``".json"``.
     project : str | Path | None
         A path to an Julia environment used to execute this task.
 
@@ -108,16 +108,12 @@ def _to_list(scalar_or_iter):
     )
 
 
-def parse_project(project: str | Path | None, root: Path) -> list[str]:
-    if project is None:
-        return []
+def parse_relative_path(path: str | Path, root: Path) -> Path:
+    """Parse a relative path."""
+    if isinstance(path, str):
+        path = Path(path)
 
-    if isinstance(project, str):
-        project = Path(project)
+    if not path.is_absolute():
+        path = root / path
 
-    if not project.is_absolute():
-        project = root / project
-
-    project = project.resolve()
-
-    return ["--project=" + project.as_posix()]
+    return path.resolve()

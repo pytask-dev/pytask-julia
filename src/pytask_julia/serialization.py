@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
-import tomli_w
 from pytask import Task
 
 
@@ -14,13 +13,12 @@ _HIDDEN_FOLDER = ".pytask"
 
 
 SERIALIZER = {
-    "toml": {"serializer": tomli_w.dumps, "suffix": ".toml"},
     "json": {"serializer": json.dumps, "suffix": ".json"},
 }
 
 try:
     import yaml
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 else:
     SERIALIZER["yaml"] = {"serializer": yaml.dump, "suffix": ".yaml"}
@@ -61,7 +59,7 @@ def serialize_keyword_arguments(
         serializer_func = serializer
     elif isinstance(serializer, str) and serializer in SERIALIZER:
         serializer_func = SERIALIZER[serializer]["serializer"]
-    else:
+    else:  # pragma: no cover
         raise ValueError(f"Serializer {serializer!r} is not known.")
 
     serialized = serializer_func(kwargs)
