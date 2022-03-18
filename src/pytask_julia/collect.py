@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import functools
-import inspect
-import itertools
 import subprocess
 import types
 from pathlib import Path
@@ -34,15 +32,6 @@ def run_jl_script(
     subprocess.run(cmd, check=True)
 
 
-_ERROR_MSG_MISSING_SCRIPT = (
-    "The function {name!r} in the module {path} is marked as a task to be executed "
-    "with Julia, but the script which should be executed is missing. Pass it to the "
-    "decorator using the 'script' keyword."
-    "\n\n    @pytask.mark.julia(script='script.jl')\n    def task_julia():\n        "
-    "pass"
-)
-
-
 @hookimpl
 def pytask_collect_task(session, path, name, obj):
     """Collect a task which is a function.
@@ -59,18 +48,22 @@ def pytask_collect_task(session, path, name, obj):
         and callable(obj)
         and has_mark(obj, "julia")
     ):
-        obj, markers = remove_marks(obj, "julia")
-        julia_mark = _merge_all_markers(
-            markers=markers,
+        obj, marks = remove_marks(obj, "julia")
+
+        if len(marks) > 1:
+            raise ValueError(
+                f"Task {name!r} has multiple @pytask.mark.julia marks, but only one is "
+                "allowed."
+            )
+
+        julia_mark = _parse_julia_mark(
+            mark=marks[0],
             default_options=session.config["julia_options"],
             default_serializer=session.config["julia_serializer"],
             default_suffix=session.config["julia_suffix"],
             default_project=session.config["julia_project"],
         )
         script, options, _, _, project = julia(**julia_mark.kwargs)
-
-        if script is None:
-            raise ValueError(_ERROR_MSG_MISSING_SCRIPT.format(name=name, path=path))
 
         obj.pytask_meta.markers.append(julia_mark)
 
@@ -113,42 +106,31 @@ def pytask_collect_task(session, path, name, obj):
         return task
 
 
-def _merge_all_markers(
-    markers, default_options, default_serializer, default_suffix, default_project
+def _parse_julia_mark(
+    mark, default_options, default_serializer, default_suffix, default_project
 ):
-    """Combine all information from markers for the compile_julia function."""
-    values = []
-    names_of_kwargs = list(inspect.signature(julia).parameters)
-    for marker in markers:
-        parsed_args = dict(zip(names_of_kwargs, julia(**marker.kwargs)))
-        values.append(parsed_args)
+    """Parse a Julia mark."""
+    script, options, serializer, suffix, project = julia(**mark.kwargs)
 
-    kwargs = {
-        "script": next((v["script"] for v in values if v["script"] is not None), None),
-        "options": default_options
-        + list(
-            itertools.chain.from_iterable(
-                v["options"] for v in values if v["options"] is not None
-            )
-        ),
-        "serializer": next(
-            (v["serializer"] for v in values if v["serializer"] is not None),
-            default_serializer,
-        ),
-        "project": next(
-            (v["project"] for v in values if v["project"] is not None),
-            default_project,
-        ),
-    }
+    parsed_kwargs = {}
+    for arg_name, value, default in [
+        ("script", script, None),
+        ("options", options, default_options),
+        ("serializer", serializer, default_serializer),
+        ("project", project, default_project),
+    ]:
+        parsed_kwargs[arg_name] = value if value else default
 
-    if isinstance(kwargs["serializer"], str) and kwargs["serializer"] in SERIALIZER:
-        proposed_suffix = SERIALIZER[kwargs["serializer"]]["suffix"]
+    if (
+        isinstance(parsed_kwargs["serializer"], str)
+        and parsed_kwargs["serializer"] in SERIALIZER
+    ):
+        proposed_suffix = SERIALIZER[parsed_kwargs["serializer"]]["suffix"]
     else:
         proposed_suffix = default_suffix
-    kwargs["suffix"] = next(
-        (v["suffix"] for v in values if v["suffix"] is not None), proposed_suffix
-    )
-    mark = Mark("julia", (), kwargs)
+    parsed_kwargs["suffix"] = suffix if suffix else proposed_suffix
+
+    mark = Mark("julia", (), parsed_kwargs)
     return mark
 
 

@@ -16,10 +16,6 @@ from tests.conftest import parametrize_parse_code_serializer_suffix
 from tests.conftest import ROOT
 
 
-class DummyTask:
-    pass
-
-
 @pytest.mark.unit
 def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     """Make sure that the task setup raises errors."""
