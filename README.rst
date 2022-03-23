@@ -32,6 +32,9 @@ pytask-julia
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/ambv/black
 
+------
+
+Run Julia scripts with pytask.
 
 Installation
 ------------
@@ -116,6 +119,23 @@ The ``.json`` file is stored in the same folder as the task in a ``.pytask`` dir
 To parse the JSON file, you need to install `JSON.jl
 <https://github.com/JuliaIO/JSON.jl>`_.
 
+You can also pass any other information to your script by using the
+``@pytask.mark.task`` decorator.
+
+.. code-block:: python
+
+    @pytask.mark.task(kwargs={"number": 1})
+    @pytask.mark.julia(script="script.jl")
+    @pytask.mark.produces("out.csv")
+    def task_run_jl_script():
+        pass
+
+and inside the script use
+
+.. code-block:: julia
+
+    config["number"]  # Is 1.
+
 
 Debugging
 ~~~~~~~~~
@@ -126,7 +146,7 @@ the report of the task. It looks roughly like this
 
 .. code-block:: console
 
-    $ julia <options> -- <path-to>/.pytask/task_py_task_example.json
+    $ julia <options> -- script.jl <path-to>/.pytask/task_py_task_example.json
 
 
 Managing Julia environments
