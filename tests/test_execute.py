@@ -42,7 +42,10 @@ def test_run_jl_script(
     import pytask
 
     @pytask.mark.julia(
-        script="script.jl", serializer="{serializer}", project="{ROOT.as_posix()}"
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{ROOT.as_posix()}",
     )
     @pytask.mark.depends_on({depends_on})
     @pytask.mark.produces("out.txt")
@@ -213,6 +216,7 @@ def test_check_passing_cmd_line_options(
     julia_script = f"""
     {parse_config_code}
     write(config["produces"], "A heart that's full up like a landfill.")
+    @assert Threads.nthreads() == {n_threads}
     """
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import ExitStack as does_not_raise  # noqa: N813
 
 import pytest
-from _pytask.mark import Mark
+from pytask import Mark
 from pytask_julia.collect import _parse_julia_mark
 from pytask_julia.collect import _parse_project
 from pytask_julia.collect import SERIALIZER
