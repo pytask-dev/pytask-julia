@@ -117,6 +117,18 @@ To parse the JSON file, you need to install `JSON.jl
 <https://github.com/JuliaIO/JSON.jl>`_.
 
 
+Debugging
+~~~~~~~~~
+
+In case a task throws an error, you might want to execute the script independently from
+pytask. After a failed execution, you see the command which executed the Julia script in
+the report of the task. It looks roughly like this
+
+.. code-block:: console
+
+    $ julia <options> -- <path-to>/.pytask/task_py_task_example.json
+
+
 Managing Julia environments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

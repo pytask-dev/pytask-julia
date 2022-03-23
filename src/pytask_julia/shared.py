@@ -7,7 +7,8 @@ from typing import Sequence
 
 
 _ERROR_MSG = """The old syntax for @pytask.mark.julia was suddenly deprecated starting \
-with pytask-julia v0.2 to provide a better user experience. Sorry for the inconviences!
+with pytask-julia v0.2 to provide a better user experience. Thank you for your \
+understanding!
 
 It is recommended to upgrade to the new syntax, so you enjoy all the benefits of v0.2 of
 pytask and pytask-julia which are
@@ -16,12 +17,12 @@ pytask and pytask-julia which are
 - Support for Julia environments for running scripts with certain packages.
 
 You can find a manual here: \
-https://github.com/pytask-dev/pytask-julia/blob/main/README.rst
+https://github.com/pytask-dev/pytask-julia/blob/v0.2.0/README.rst
 
-It can be as easy as rewriting your current task from
+Upgrading can be as easy as rewriting your current task from
 
     @pytask.mark.julia(["--threads", 2, "--", "path_to_dependency.txt"])
-    @pytask.mark.depends_on("script.jl)
+    @pytask.mark.depends_on("script.jl")
     @pytask.mark.produces("out.csv")
     def task_julia():
         ...
@@ -34,7 +35,7 @@ to
     def task_julia():
         ...
 
-You can also fix the version of the package to pytask-julia<0.2, so you do not have to \
+You can also fix the version of pytask and pytask-julia to <0.2, so you do not have to \
 to upgrade. At the same time, you will not enjoy the improvements released with \
 version v0.2 of pytask and pytask-julia.
 

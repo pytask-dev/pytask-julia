@@ -11,12 +11,17 @@ from pytask_julia.shared import julia
     "args, kwargs, expectation, expected",
     [
         ((), {}, pytest.raises(RuntimeError, match="The old syntax"), None),
-        (("-o"), {}, pytest.raises(RuntimeError, match="The old syntax"), None),
+        (
+            ("-o"),
+            {"script": "script.jl"},
+            pytest.raises(RuntimeError, match="The old syntax"),
+            None,
+        ),
         (
             (),
             {"options": ("-o")},
             pytest.raises(RuntimeError, match="The old syntax"),
-            (None, ["-o"], None, None, None),
+            None,
         ),
         (
             (),
