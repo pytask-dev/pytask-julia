@@ -36,6 +36,11 @@ pytask-julia
 
 Run Julia scripts with pytask.
 
+----
+
+Run Julia scripts with pytask.
+
+
 Installation
 ------------
 
@@ -281,6 +286,52 @@ Here is a replication of the JSON example.
     @pytask.mark.julia(script="script.jl", serializer=json.dumps, suffix=".json")
     def task_example():
         ...
+
+
+Configuration
+~~~~~~~~~~~~~
+
+You can influence the default behavior of pytask-julia with some configuration values.
+
+julia_serializer
+    Use this option to change the default serializer.
+
+    .. code-block:: ini
+
+        julia_serializer = json
+
+julia_suffix
+    Use this option to set the default suffix of the file which contains serialized
+    paths to dependencies and products and more.
+
+    .. code-block:: ini
+
+        julia_suffix = .json
+
+julia_options
+    Use this option to set default options for each task which are separated by
+    whitespace.
+
+    .. code-block:: ini
+
+        julia_options = --threads 2
+
+julia_project
+    Use this option to set a default environment for each task. Use either a path
+    relative to the configuration file or an absolute path. If your environment with
+    ``Manifest.toml`` and ``Project.toml`` is defined in the same directory as the
+    configuration file pytask.ini, just use a dot.
+
+    .. code-block:: ini
+
+        julia_project = .
+
+    If the environment files were in a folder next to the configuration file called
+    ``environment`` use
+
+    .. code-block:: ini
+
+        julia_project = environment
 
 
 Changes
