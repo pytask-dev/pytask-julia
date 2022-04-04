@@ -228,9 +228,16 @@ def test_check_passing_cmd_line_options(
 @needs_julia
 @pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
+@pytest.mark.parametrize(
+    "config_path, value",
+    [
+        ("pytask.ini", "[pytask]\njulia_project={}"),
+        ("pyproject.toml", "[tool.pytask.ini_options]\njulia_project='{}'"),
+    ],
+)
 @pytest.mark.parametrize("path", [ROOT, "relative_from_config"])
 def test_run_jl_script_w_environment_in_config(
-    runner, tmp_path, parse_config_code, serializer, suffix, path
+    runner, tmp_path, parse_config_code, serializer, suffix, config_path, value, path
 ):
     task_source = f"""
     import pytask
@@ -259,9 +266,7 @@ def test_run_jl_script_w_environment_in_config(
         path_in_config = path.as_posix()
     else:
         path_in_config = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
-    tmp_path.joinpath("pytask.ini").write_text(
-        f"[pytask]\njulia_project={path_in_config}"
-    )
+    tmp_path.joinpath(config_path).write_text(value.format(path_in_config))
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
 

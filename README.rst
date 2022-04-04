@@ -170,10 +170,10 @@ Probably your environment files ``Manifest.toml`` and ``Project.toml`` reside at
 root of your project folder as well as your pytask configuration file. Then, the content
 will look like this.
 
-.. code-block:: ini
+.. code-block:: toml
 
     [pytask]
-    julia_project = .
+    julia_project = "."
 
 
 You can also define environments for each task which will overwrite any other default
@@ -296,42 +296,42 @@ You can influence the default behavior of pytask-julia with some configuration v
 julia_serializer
     Use this option to change the default serializer.
 
-    .. code-block:: ini
+    .. code-block:: toml
 
-        julia_serializer = json
+        julia_serializer = "json"
 
 julia_suffix
     Use this option to set the default suffix of the file which contains serialized
     paths to dependencies and products and more.
 
-    .. code-block:: ini
+    .. code-block:: toml
 
-        julia_suffix = .json
+        julia_suffix = ".json"
 
 julia_options
     Use this option to set default options for each task which are separated by
     whitespace.
 
-    .. code-block:: ini
+    .. code-block:: toml
 
-        julia_options = --threads 2
+        julia_options = ["--threads", 2]
 
 julia_project
     Use this option to set a default environment for each task. Use either a path
     relative to the configuration file or an absolute path. If your environment with
     ``Manifest.toml`` and ``Project.toml`` is defined in the same directory as the
-    configuration file pytask.ini, just use a dot.
+    configuration file ``pyproject.toml``, just use a dot.
 
-    .. code-block:: ini
+    .. code-block:: toml
 
-        julia_project = .
+        julia_project = "."
 
     If the environment files were in a folder next to the configuration file called
     ``environment`` use
 
-    .. code-block:: ini
+    .. code-block:: toml
 
-        julia_project = environment
+        julia_project = "environment"
 
 
 Changes
