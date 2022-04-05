@@ -10,7 +10,7 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/pytask-dev/pytask-julia/main.svg)](https://results.pre-commit.ci/latest/github/pytask-dev/pytask-julia/main)
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-------------------------------------------------------------------------
+______________________________________________________________________
 
 Run Julia scripts with pytask.
 
@@ -85,8 +85,7 @@ config = JSON.parse(read(path_to_json, String))  # A dictionary.
 config["produces"]  # Is the path to the output file "../out.csv".
 ```
 
-The `.json` file is stored in the same folder as the task in a `.pytask`
-directory.
+The `.json` file is stored in the same folder as the task in a `.pytask` directory.
 
 To parse the JSON file, you need to install
 [JSON.jl](https://github.com/JuliaIO/JSON.jl).
@@ -123,8 +122,8 @@ $ julia <options> -- script.jl <path-to>/.pytask/task_py_task_example.json
 Julia has support for environments to execute your tasks via `Pkg.jl` which is explained
 [here](https://pkgdocs.julialang.org/v1/environments/).
 
-pytask-julia allows you define a default environment via your [pytask configuration
-file](https://pytask-dev.readthedocs.io/en/stable/tutorials/configuration.html).
+pytask-julia allows you define a default environment via your
+[pytask configuration file](https://pytask-dev.readthedocs.io/en/stable/tutorials/configuration.html).
 
 Use the `julia_project` key to define an absolute path or a path relative to your
 configuration file to point to your environment.
