@@ -108,6 +108,7 @@ def test_parse_julia_mark(
         assert out == expected
 
 
+@pytest.mark.unit
 @pytest.mark.parametrize(
     "project, root, expected",
     [
