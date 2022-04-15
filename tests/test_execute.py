@@ -70,6 +70,7 @@ def test_run_jl_script(
     tmp_path.joinpath("script.jl").write_text(textwrap.dedent(julia_script))
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
+    print(result.output)
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
