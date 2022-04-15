@@ -40,6 +40,13 @@ jobs:
         shell: bash -l {0}
         run: conda install -c conda-forge tox-conda coverage mamba
 
+      - name: Install Julia
+        shell: bash -l {0}
+        if: runner.os != 'Windows'
+        run: |
+          mamba install -c conda-forge julia
+          julia --project=. --eval "import Pkg; Pkg.instantiate()"
+
       # Unit, integration, and end-to-end tests.
 
       - name: Run unit tests and doctests.
