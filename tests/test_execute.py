@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import textwrap
 from pathlib import Path
 
@@ -227,6 +228,7 @@ def test_check_passing_cmd_line_options(
 
 @needs_julia
 @pytest.mark.end_to_end
+@pytest.mark.skipif(sys.platform == "win32" and "CI" in os.environ, reason="CI")
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize(
     "config_path, value",
@@ -280,6 +282,7 @@ def test_run_jl_script_w_environment_in_config(
 @needs_julia
 @pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
+@pytest.mark.skipif(sys.platform == "win32" and "CI" in os.environ, reason="CI")
 def test_run_jl_script_w_environment_relative_to_task(
     runner, tmp_path, parse_config_code, serializer, suffix
 ):
