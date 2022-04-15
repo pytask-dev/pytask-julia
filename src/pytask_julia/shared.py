@@ -17,7 +17,7 @@ pytask and pytask-julia which are
 - Support for Julia environments for running scripts with certain packages.
 
 You can find a manual here: \
-https://github.com/pytask-dev/pytask-julia/blob/v0.2.0/README.rst
+https://github.com/pytask-dev/pytask-julia/blob/v0.2.0/README.md
 
 Upgrading can be as easy as rewriting your current task from
 

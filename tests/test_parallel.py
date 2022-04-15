@@ -40,7 +40,7 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
 ):
     """Test parallelization over source files.
 
-    Same as in README.rst.
+    Same as in README.md.
 
     """
     source = f"""
@@ -111,7 +111,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
 ):
     """Test parallelization over source files.
 
-    Same as in README.rst.
+    Same as in README.md.
 
     """
     source = f"""
@@ -170,7 +170,7 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
 ):
     """Test parallelization over the same source file.
 
-    Same as in README.rst.
+    Same as in README.md.
 
     """
     source = f"""
@@ -219,7 +219,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
 ):
     """Test parallelization over the same source file.
 
-    Same as in README.rst.
+    Same as in README.md.
 
     """
     source = f"""
