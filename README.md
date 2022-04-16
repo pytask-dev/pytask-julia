@@ -133,7 +133,7 @@ your project folder as well as your pytask configuration file. Then, the content
 look like this.
 
 ```toml
-[pytask]
+[tool.pytask.ini_options]
 julia_project = "."
 ```
 
@@ -245,12 +245,14 @@ def task_example():
 ### Configuration
 
 You can influence the default behavior of pytask-julia with some configuration values.
+Place them into a `pyproject.toml` file.
 
 **`julia_serializer`**
 
 Use this option to change the default serializer.
 
 ```toml
+[tool.pytask.ini_options]
 julia_serializer = "json"
 ```
 
@@ -260,6 +262,7 @@ Use this option to set the default suffix of the file which contains serialized 
 dependencies and products and more.
 
 ```toml
+[tool.pytask.ini_options]
 julia_suffix = ".json"
 ```
 
@@ -268,6 +271,7 @@ julia_suffix = ".json"
 Use this option to set default options for each task which are separated by whitespace.
 
 ```toml
+[tool.pytask.ini_options]
 julia_options = ["--threads", 2]
 ```
 
@@ -279,6 +283,7 @@ and `Project.toml` is defined in the same directory as the configuration file
 `pyproject.toml`, just use a dot.
 
 ```toml
+[tool.pytask.ini_options]
 julia_project = "."
 ```
 
@@ -286,6 +291,7 @@ If the environment files were in a folder next to the configuration file called
 `environment` use
 
 ```toml
+[tool.pytask.ini_options]
 julia_project = "environment"
 ```
 
