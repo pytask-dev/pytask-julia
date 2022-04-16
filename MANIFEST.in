@@ -9,3 +9,4 @@ exclude *.yml
 
 include README.md
 include LICENSE
+include pyproject.toml
