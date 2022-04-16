@@ -244,9 +244,6 @@ def test_check_passing_cmd_line_options(
 def test_run_jl_script_w_environment_in_config(
     runner, tmp_path, parse_config_code, serializer, suffix, config_path, value, path
 ):
-    print(sys.platform)
-    print(os.environ.get("CI"))
-    print(sys.platform == "win32" and os.environ.get("CI") == "true")
     task_source = f"""
     import pytask
 
