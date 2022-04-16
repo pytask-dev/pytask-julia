@@ -5,8 +5,9 @@ chronological order. Releases follow [semantic versioning](https://semver.org/) 
 releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia).
 
-## 0.2.0 - 2022-xx-xx
+## 0.2.0 - 2022-04-16
 
+- {pull}`6` skip concurrent builds.
 - {pull}`7` implements the new interface of pytask-julia with the decorator and an
   approach to serialize arguments to pass them to the executed script.
 - {pull}`8` removes an unnecessary hook.
