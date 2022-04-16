@@ -229,7 +229,7 @@ def test_check_passing_cmd_line_options(
 @needs_julia
 @pytest.mark.end_to_end
 @pytest.mark.xfail(
-    sys.platform == "win32" and os.environ.get("CI") == "true",
+    condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
 )
 @parametrize_parse_code_serializer_suffix
@@ -244,6 +244,9 @@ def test_check_passing_cmd_line_options(
 def test_run_jl_script_w_environment_in_config(
     runner, tmp_path, parse_config_code, serializer, suffix, config_path, value, path
 ):
+    print(sys.platform)
+    print(os.environ.get("CI"))
+    print(sys.platform == "win32" and os.environ.get("CI") == "true")
     task_source = f"""
     import pytask
 
@@ -285,7 +288,7 @@ def test_run_jl_script_w_environment_in_config(
 @needs_julia
 @pytest.mark.end_to_end
 @pytest.mark.xfail(
-    sys.platform == "win32" and os.environ.get("CI") == "true",
+    condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
 )
 @parametrize_parse_code_serializer_suffix
