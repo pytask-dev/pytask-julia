@@ -228,6 +228,10 @@ def test_check_passing_cmd_line_options(
 
 @needs_julia
 @pytest.mark.end_to_end
+@pytest.mark.xfail(
+    sys.platform == "win32" and os.environ.get("CI") == "true",
+    reason="Test folder and repo are on different drives causing relpath to fail.",
+)
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize(
     "config_path, value",
@@ -266,9 +270,6 @@ def test_run_jl_script_w_environment_in_config(
     if isinstance(path, Path):
         path_in_config = path.as_posix()
     else:
-        if sys.platform.startswith("win") and ROOT.parents[-1] != tmp_path.parents[-1]:
-            pytest.xfail(reason="The test folder and the repo are on different drives.")
-
         path_in_config = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
     tmp_path.joinpath(config_path).write_text(value.format(path_in_config))
 
@@ -283,13 +284,14 @@ def test_run_jl_script_w_environment_in_config(
 
 @needs_julia
 @pytest.mark.end_to_end
+@pytest.mark.xfail(
+    sys.platform == "win32" and os.environ.get("CI") == "true",
+    reason="Test folder and repo are on different drives causing relpath to fail.",
+)
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_environment_relative_to_task(
     runner, tmp_path, parse_config_code, serializer, suffix
 ):
-    if sys.platform.startswith("win") and ROOT.parents[-1] != tmp_path.parents[-1]:
-        pytest.xfail(reason="The test folder and the repo are on different drives.")
-
     project_in_task = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
 
     task_source = f"""
