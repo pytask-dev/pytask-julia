@@ -21,5 +21,4 @@ coverage:
 
 ignore:
   - ".tox/**/*"
-  - "setup.py"
   - "src/pytask_julia/_version.py"

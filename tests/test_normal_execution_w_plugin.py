@@ -1,8 +1,11 @@
 """Contains tests which do not require the plugin and ensure normal execution."""
+from __future__ import annotations
+
 import textwrap
 
 import pytest
 from pytask import cli
+from pytask import ExitCode
 
 
 @pytest.mark.end_to_end
@@ -33,4 +36,4 @@ def test_execution_w_varying_dependencies_products(
         tmp_path.joinpath(dependency).touch()
 
     result = runner.invoke(cli, [tmp_path.as_posix()])
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.OK

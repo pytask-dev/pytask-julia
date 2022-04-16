@@ -1,147 +1,170 @@
 """Collect tasks."""
-import copy
+from __future__ import annotations
+
 import functools
 import subprocess
-from typing import Iterable
-from typing import Optional
-from typing import Sequence
-from typing import Union
+import types
+from pathlib import Path
 
-from _pytask.config import hookimpl
-from _pytask.mark_utils import get_specific_markers_from_task
-from _pytask.nodes import FilePathNode
-from _pytask.parametrize import _copy_func
+from pytask import depends_on
+from pytask import has_mark
+from pytask import hookimpl
+from pytask import Mark
+from pytask import parse_nodes
+from pytask import produces
+from pytask import remove_marks
+from pytask import Task
+from pytask_julia.serialization import SERIALIZER
+from pytask_julia.shared import julia
+from pytask_julia.shared import parse_relative_path
 
 
-_SEPARATOR = "--"
+_SEPARATOR: str = "--"
 """str: Separates options for the Julia executable and arguments to the file."""
 
 
-def julia(options: Optional[Union[str, Iterable[str]]] = None):
-    """Specify command line options for Julia.
-
-    Parameters
-    ----------
-    options : Optional[Union[str, Iterable[str]]]
-        One or multiple command line options passed to Julia.
-
-    """
-    options = [_SEPARATOR] if options is None else _to_list(options)
-    options = [str(i) for i in options]
-
-    return options
-
-
-def run_jl_script(julia):
+def run_jl_script(
+    script: Path, options: list[str], serialized: Path, project: list[str]
+) -> None:
     """Run a Julia script."""
-    print("Executing " + " ".join(julia) + ".")  # noqa: T001
-    subprocess.run(julia, check=True)
+    cmd = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
+    print("Executing " + " ".join(cmd) + ".")  # noqa: T001
+    subprocess.run(cmd, check=True)
 
 
 @hookimpl
-def pytask_collect_task_teardown(session, task):
-    """Perform some checks."""
-    if get_specific_markers_from_task(task, "julia"):
-        source = _get_node_from_dictionary(task.depends_on, "source")
-        if isinstance(source, FilePathNode) and source.value.suffix not in [".jl"]:
+def pytask_collect_task(session, path, name, obj):
+    """Collect a task which is a function.
+
+    There is some discussion on how to detect functions in this `thread
+    <https://stackoverflow.com/q/624926/7523785>`_. :class:`types.FunctionType` does not
+    detect built-ins which is not possible anyway.
+
+    """
+    __tracebackhide__ = True
+
+    if (
+        (name.startswith("task_") or has_mark(obj, "task"))
+        and callable(obj)
+        and has_mark(obj, "julia")
+    ):
+        obj, marks = remove_marks(obj, "julia")
+
+        if len(marks) > 1:
             raise ValueError(
-                "The first dependency of a Julia task must be the script to be "
-                "executed."
+                f"Task {name!r} has multiple @pytask.mark.julia marks, but only one is "
+                "allowed."
             )
 
-        julia_function = _copy_func(run_jl_script)
-        julia_function.pytaskmark = copy.deepcopy(task.function.pytaskmark)
+        julia_mark = _parse_julia_mark(
+            mark=marks[0],
+            default_options=session.config["julia_options"],
+            default_serializer=session.config["julia_serializer"],
+            default_suffix=session.config["julia_suffix"],
+            default_project=session.config["julia_project"],
+        )
+        script, options, _, _, project = julia(**julia_mark.kwargs)
 
-        merged_marks = _merge_all_markers(task)
-        args = julia(*merged_marks.args, **merged_marks.kwargs)
-        options = _prepare_cmd_options(session, task, args)
-        julia_function = functools.partial(julia_function, julia=options)
+        obj.pytask_meta.markers.append(julia_mark)
 
-        task.function = julia_function
+        dependencies = parse_nodes(session, path, name, obj, depends_on)
+        products = parse_nodes(session, path, name, obj, produces)
+
+        markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
+        kwargs = obj.pytask_meta.kwargs if hasattr(obj, "pytask_meta") else {}
+
+        task = Task(
+            base_name=name,
+            path=path,
+            function=_copy_func(run_jl_script),
+            depends_on=dependencies,
+            produces=products,
+            markers=markers,
+            kwargs=kwargs,
+        )
+
+        script_node = session.hook.pytask_collect_node(
+            session=session, path=path, node=script
+        )
+
+        if isinstance(task.depends_on, dict):
+            task.depends_on["__script"] = script_node
+            task.attributes["julia_keep_dict"] = True
+        else:
+            task.depends_on = {0: task.depends_on, "__script": script_node}
+            task.attributes["julia_keep_dict"] = False
+
+        parsed_project = _parse_project(project, task.path.parent)
+
+        task.function = functools.partial(
+            task.function,
+            script=task.depends_on["__script"].path,
+            options=options,
+            project=parsed_project,
+        )
+
+        return task
 
 
-def _get_node_from_dictionary(obj, key, fallback=0):
-    """Get node from dictionary."""
-    if isinstance(obj, dict):
-        obj = obj.get(key) or obj.get(fallback)
-    return obj
+def _parse_julia_mark(
+    mark, default_options, default_serializer, default_suffix, default_project
+):
+    """Parse a Julia mark."""
+    script, options, serializer, suffix, project = julia(**mark.kwargs)
 
+    parsed_kwargs = {}
+    for arg_name, value, default in [
+        ("script", script, None),
+        ("options", options, default_options),
+        ("serializer", serializer, default_serializer),
+    ]:
+        parsed_kwargs[arg_name] = value if value else default
 
-def _merge_all_markers(task):
-    """Combine all information from markers for the compile_julia function."""
-    julia_marks = get_specific_markers_from_task(task, "julia")
-    mark = julia_marks[0]
-    for mark_ in julia_marks[1:]:
-        mark = mark.combined_with(mark_)
+    if (
+        isinstance(parsed_kwargs["serializer"], str)
+        and parsed_kwargs["serializer"] in SERIALIZER
+    ):
+        proposed_suffix = SERIALIZER[parsed_kwargs["serializer"]]["suffix"]
+    else:
+        proposed_suffix = default_suffix
+    parsed_kwargs["suffix"] = suffix if suffix else proposed_suffix
+
+    if isinstance(project, (str, Path)):
+        parsed_kwargs["project"] = project
+    else:
+        parsed_kwargs["project"] = default_project
+
+    mark = Mark("julia", (), parsed_kwargs)
     return mark
 
 
-_ERROR_MSG_MISSING_SEPARATOR = f"""The inputs of the @pytask.mark.julia decorator do not
-contain the separator to differentiate between options for the julia executable and
-arguments to the script. This was passed to the decorator:
+def _copy_func(func: types.FunctionType) -> types.FunctionType:
+    """Create a copy of a function.
 
-{{}}
+    Based on https://stackoverflow.com/a/13503277/7523785.
 
-Construct the inputs to the decorator should contain, first, options to the executable,
-secondly, the separator - "{_SEPARATOR}" -, thirdly, arguments to the script.
-
-Here is an example:
-
-@pytask.mark.julia(("--threads", "1", "{_SEPARATOR}", "input.file"))
-
-Even if you do not need the left or the right side of the decorator, you must put the
-separator at the correct position.
-"""
-
-
-def _prepare_cmd_options(session, task, args):
-    """Prepare the command line arguments to execute the do-file.
-
-    The last entry changes the name of the log file. We take the task id as a name which
-    is unique and does not cause any errors when parallelizing the execution.
-
-    """
-    source = _get_node_from_dictionary(
-        task.depends_on, session.config["julia_source_key"]
-    )
-
-    if _SEPARATOR not in args:
-        raise ValueError(_ERROR_MSG_MISSING_SEPARATOR.format(args))
-    else:
-        idx_sep = args.index(_SEPARATOR)
-        executable_options = args[:idx_sep]
-        script_arguments = args[idx_sep + 1 :]
-
-    return [
-        "julia",
-        *executable_options,
-        _SEPARATOR,
-        source.path.as_posix(),
-        *script_arguments,
-    ]
-
-
-def _to_list(scalar_or_iter):
-    """Convert scalars and iterables to list.
-
-    Parameters
-    ----------
-    scalar_or_iter : str or list
-
-    Returns
+    Example
     -------
-    list
-
-    Examples
-    --------
-    >>> _to_list("a")
-    ['a']
-    >>> _to_list(["b"])
-    ['b']
+    >>> def _func(): pass
+    >>> copied_func = _copy_func(_func)
+    >>> _func is copied_func
+    False
 
     """
-    return (
-        [scalar_or_iter]
-        if isinstance(scalar_or_iter, str) or not isinstance(scalar_or_iter, Sequence)
-        else list(scalar_or_iter)
+    new_func = types.FunctionType(
+        func.__code__,
+        func.__globals__,
+        name=func.__name__,
+        argdefs=func.__defaults__,
+        closure=func.__closure__,
     )
+    new_func = functools.update_wrapper(new_func, func)
+    new_func.__kwdefaults__ = func.__kwdefaults__
+    return new_func
+
+
+def _parse_project(project: str | Path | None, root: Path) -> list[str]:
+    if project is None:
+        return []
+    project = parse_relative_path(project, root)
+    return ["--project=" + project.as_posix()]
