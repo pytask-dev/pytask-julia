@@ -45,8 +45,8 @@ or choose one of the installers on this [page](https://julialang.org/downloads/)
 ## Usage
 
 To create a task which runs a Julia script, define a task function with the
-`@pytask.mark.julia` decorator. The `script` keyword provides a path
-relative to the task module to the Julia script.
+`@pytask.mark.julia` decorator. The `script` keyword provides a path relative to the
+task module to the Julia script.
 
 ```python
 import pytask
