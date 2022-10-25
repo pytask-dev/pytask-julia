@@ -45,8 +45,8 @@ or choose one of the installers on this [page](https://julialang.org/downloads/)
 ## Usage
 
 To create a task which runs a Julia script, define a task function with the
-`@pytask.mark.julia` decorator. The `script` keyword provides an absolute path or path
-relative to the task module to the Julia script.
+`@pytask.mark.julia` decorator. The `script` keyword provides a path relative to the
+task module to the Julia script.
 
 ```python
 import pytask
@@ -125,8 +125,8 @@ Julia has support for environments to execute your tasks via `Pkg.jl` which is e
 pytask-julia allows you define a default environment via your
 [pytask configuration file](https://pytask-dev.readthedocs.io/en/stable/tutorials/configuration.html).
 
-Use the `julia_project` key to define an absolute path or a path relative to your
-configuration file to point to your environment.
+Use the `julia_project` key to define a path to your configuration file to point to your
+environment.
 
 Probably your environment files `Manifest.toml` and `Project.toml` reside at the root of
 your project folder as well as your pytask configuration file. Then, the content will
@@ -138,8 +138,7 @@ julia_project = "."
 ```
 
 You can also define environments for each task which will overwrite any other default
-with the `project` keyword argument. Pass an absolute path or a path relative to the
-task module.
+with the `project` keyword argument. Pass a path to the task module.
 
 ```python
 @pytask.mark.julia(script="script.jl", project=".")
@@ -277,10 +276,9 @@ julia_options = ["--threads", 2]
 
 **`julia_project`**
 
-Use this option to set a default environment for each task. Use either a path relative
-to the configuration file or an absolute path. If your environment with `Manifest.toml`
-and `Project.toml` is defined in the same directory as the configuration file
-`pyproject.toml`, just use a dot.
+Use this option to set a default environment for each task. If your environment with
+`Manifest.toml` and `Project.toml` is defined in the same directory as the configuration
+file `pyproject.toml`, just use a dot.
 
 ```toml
 [tool.pytask.ini_options]
