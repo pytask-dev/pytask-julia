@@ -125,8 +125,8 @@ Julia has support for environments to execute your tasks via `Pkg.jl` which is e
 pytask-julia allows you define a default environment via your
 [pytask configuration file](https://pytask-dev.readthedocs.io/en/stable/tutorials/configuration.html).
 
-Use the `julia_project` key to define a path to your
-configuration file to point to your environment.
+Use the `julia_project` key to define a path to your configuration file to point to your
+environment.
 
 Probably your environment files `Manifest.toml` and `Project.toml` reside at the root of
 your project folder as well as your pytask configuration file. Then, the content will
@@ -276,9 +276,9 @@ julia_options = ["--threads", 2]
 
 **`julia_project`**
 
-Use this option to set a default environment for each task. If your environment with `Manifest.toml`
-and `Project.toml` is defined in the same directory as the configuration file
-`pyproject.toml`, just use a dot.
+Use this option to set a default environment for each task. If your environment with
+`Manifest.toml` and `Project.toml` is defined in the same directory as the configuration
+file `pyproject.toml`, just use a dot.
 
 ```toml
 [tool.pytask.ini_options]
