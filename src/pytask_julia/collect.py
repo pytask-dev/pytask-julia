@@ -28,7 +28,7 @@ def run_jl_script(
 ) -> None:
     """Run a Julia script."""
     cmd = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
-    print("Executing " + " ".join(cmd) + ".")  # noqa: T001
+    print("Executing " + " ".join(cmd) + ".")  # noqa: T201
     subprocess.run(cmd, check=True)
 
 
