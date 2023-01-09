@@ -15,7 +15,7 @@ from pytask_julia.shared import julia
 
 
 @hookimpl
-def pytask_execute_task_setup(task):
+def pytask_execute_task_setup(task: Task) -> None:
     """Check whether environment allows executing Julia files."""
     marks = get_marks(task, "julia")
     if marks:

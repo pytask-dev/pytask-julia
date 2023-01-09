@@ -19,7 +19,7 @@ parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parametrized_execution_of_jl_script_w_parametrize(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -54,7 +54,7 @@ def test_parametrized_execution_of_jl_script_w_parametrize(
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    for name in ["script_1.jl", "script_2.jl"]:
+    for name in ("script_1.jl", "script_2.jl"):
         julia_script = f"""
         {parse_config_code}
         write(config["produces"], config["content"])
@@ -66,7 +66,7 @@ def test_parametrized_execution_of_jl_script_w_parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parametrized_execution_of_jl_script_w_loop(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -92,7 +92,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
 
-    for name in ["script_1.jl", "script_2.jl"]:
+    for name in ("script_1.jl", "script_2.jl"):
         julia_script = f"""
         {parse_config_code}
         write(config["produces"], config["content"])
@@ -104,7 +104,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parametrize_jl_options_and_product_paths_w_parametrize(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -151,7 +151,7 @@ def test_parametrize_jl_options_and_product_paths_w_parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parametrize_jl_options_and_product_paths_w_loop(
     runner, tmp_path, parse_config_code, serializer, suffix

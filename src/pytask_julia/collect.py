@@ -5,6 +5,8 @@ import functools
 import subprocess
 import types
 from pathlib import Path
+from typing import Any
+from typing import Callable
 
 from pytask import depends_on
 from pytask import has_mark
@@ -13,6 +15,7 @@ from pytask import Mark
 from pytask import parse_nodes
 from pytask import produces
 from pytask import remove_marks
+from pytask import Session
 from pytask import Task
 from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import julia
@@ -33,12 +36,15 @@ def run_jl_script(
 
 
 @hookimpl
-def pytask_collect_task(session, path, name, obj):
+def pytask_collect_task(
+    session: Session, path: Path, name: str, obj: Any
+) -> Task | None:
     """Collect a task which is a function.
 
     There is some discussion on how to detect functions in this `thread
-    <https://stackoverflow.com/q/624926/7523785>`_. :class:`types.FunctionType` does not
-    detect built-ins which is not possible anyway.
+
+    <https://stackoverflow.com/q/624926/7523785>`_. :class:`types.FunctionType`
+    does notdetect built-ins which is not possible anyway.
 
     """
     __tracebackhide__ = True
@@ -76,7 +82,7 @@ def pytask_collect_task(session, path, name, obj):
         task = Task(
             base_name=name,
             path=path,
-            function=_copy_func(run_jl_script),
+            function=_copy_func(run_jl_script),  # type: ignore[arg-type]
             depends_on=dependencies,
             produces=products,
             markers=markers,
@@ -104,30 +110,34 @@ def pytask_collect_task(session, path, name, obj):
         )
 
         return task
+    return None
 
 
 def _parse_julia_mark(
-    mark, default_options, default_serializer, default_suffix, default_project
-):
+    mark: Mark,
+    default_options: list[str] | None,
+    default_serializer: Callable[..., str] | str | None,
+    default_suffix: str | None,
+    default_project: str | None,
+) -> Mark:
     """Parse a Julia mark."""
     script, options, serializer, suffix, project = julia(**mark.kwargs)
 
     parsed_kwargs = {}
-    for arg_name, value, default in [
+    for arg_name, value, default in (
         ("script", script, None),
         ("options", options, default_options),
         ("serializer", serializer, default_serializer),
-    ]:
-        parsed_kwargs[arg_name] = value if value else default
-
-    if (
-        isinstance(parsed_kwargs["serializer"], str)
-        and parsed_kwargs["serializer"] in SERIALIZERS
     ):
-        proposed_suffix = SERIALIZERS[parsed_kwargs["serializer"]]["suffix"]
-    else:
-        proposed_suffix = default_suffix
-    parsed_kwargs["suffix"] = suffix if suffix else proposed_suffix
+        parsed_kwargs[arg_name] = value or default
+
+    proposed_suffix = (
+        SERIALIZERS[parsed_kwargs["serializer"]]["suffix"]
+        if isinstance(parsed_kwargs["serializer"], str)
+        and parsed_kwargs["serializer"] in SERIALIZERS
+        else default_suffix
+    )
+    parsed_kwargs["suffix"] = suffix or proposed_suffix  # type: ignore[assignment]
 
     if isinstance(project, (str, Path)):
         parsed_kwargs["project"] = project
