@@ -10,19 +10,6 @@ from pytask_julia.shared import julia
 @pytest.mark.parametrize(
     "args, kwargs, expectation, expected",
     [
-        ((), {}, pytest.raises(RuntimeError, match="The old syntax"), None),
-        (
-            ("-o"),
-            {"script": "script.jl"},
-            pytest.raises(RuntimeError, match="The old syntax"),
-            None,
-        ),
-        (
-            (),
-            {"options": ("-o")},
-            pytest.raises(RuntimeError, match="The old syntax"),
-            None,
-        ),
         (
             (),
             {

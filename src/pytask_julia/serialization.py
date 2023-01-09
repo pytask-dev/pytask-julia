@@ -12,7 +12,7 @@ from pytask import Task
 _HIDDEN_FOLDER = ".pytask"
 
 
-SERIALIZER = {
+SERIALIZERS = {
     "json": {"serializer": json.dumps, "suffix": ".json"},
 }
 
@@ -21,8 +21,8 @@ try:
 except ImportError:  # pragma: no cover
     pass
 else:
-    SERIALIZER["yaml"] = {"serializer": yaml.dump, "suffix": ".yaml"}
-    SERIALIZER["yml"] = {"serializer": yaml.dump, "suffix": ".yml"}
+    SERIALIZERS["yaml"] = {"serializer": yaml.dump, "suffix": ".yaml"}
+    SERIALIZERS["yml"] = {"serializer": yaml.dump, "suffix": ".yml"}
 
 
 def create_path_to_serialized(task: Task, suffix: str) -> Path:
@@ -57,8 +57,8 @@ def serialize_keyword_arguments(
 ) -> None:
     if callable(serializer):
         serializer_func = serializer
-    elif isinstance(serializer, str) and serializer in SERIALIZER:
-        serializer_func = SERIALIZER[serializer]["serializer"]
+    elif isinstance(serializer, str) and serializer in SERIALIZERS:
+        serializer_func = SERIALIZERS[serializer]["serializer"]
     else:  # pragma: no cover
         raise ValueError(f"Serializer {serializer!r} is not known.")
 
