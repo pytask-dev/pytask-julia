@@ -5,7 +5,7 @@
 [![image](https://img.shields.io/conda/vn/conda-forge/pytask-julia.svg)](https://anaconda.org/conda-forge/pytask-julia)
 [![image](https://img.shields.io/conda/pn/conda-forge/pytask-julia.svg)](https://anaconda.org/conda-forge/pytask-julia)
 [![PyPI - License](https://img.shields.io/pypi/l/pytask-julia)](https://pypi.org/project/pytask-julia)
-[![image](https://img.shields.io/github/workflow/status/pytask-dev/pytask-julia/main/main)](https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain)
+[![image](https://img.shields.io/github/actions/workflow/status/pytask-dev/pytask-julia/main.yml?branch=main)](https://github.com/pytask-dev/pytask-julia/actions?query=branch%3Amain)
 [![image](https://codecov.io/gh/pytask-dev/pytask-julia/branch/main/graph/badge.svg)](https://codecov.io/gh/pytask-dev/pytask-julia)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/pytask-dev/pytask-julia/main.svg)](https://results.pre-commit.ci/latest/github/pytask-dev/pytask-julia/main)
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
@@ -296,3 +296,16 @@ julia_project = "environment"
 ## Changes
 
 Consult the [release notes](CHANGES.md) to find out about what is new.
+
+## Development
+
+After setting up the environment, enter
+
+```console
+$ julia
+$ ]
+$ pkg> activate .
+$ pkg> instantiate
+```
+
+to set up the Julia environment.
