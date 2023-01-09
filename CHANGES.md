@@ -7,7 +7,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## 0.3.0 - 2023-xx-xx
 
-- {pull}`17` deprecates INI configurations and aligns the package with pytask v0.3.
+- {pull}`18` deprecates INI configurations and aligns the package with pytask v0.3.
 
 ## 0.2.1 - 2022-04-16
 
