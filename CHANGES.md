@@ -5,6 +5,10 @@ chronological order. Releases follow [semantic versioning](https://semver.org/) 
 releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia).
 
+## 0.3.0 - 2023-xx-xx
+
+- {pull}`17` deprecates INI configurations and aligns the package with pytask v0.3.
+
 ## 0.2.1 - 2022-04-16
 
 - {pull}`12` includes `pyproject.toml` in the package.

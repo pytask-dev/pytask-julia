@@ -6,7 +6,7 @@ import pytest
 from pytask import Mark
 from pytask_julia.collect import _parse_julia_mark
 from pytask_julia.collect import _parse_project
-from pytask_julia.collect import SERIALIZER
+from pytask_julia.collect import SERIALIZERS
 
 from tests.conftest import ROOT
 
@@ -16,34 +16,6 @@ from tests.conftest import ROOT
     "mark, default_options, default_serializer, default_suffix, default_project, "
     "expectation, expected",
     [
-        (
-            Mark("julia", (), {}),
-            [],
-            None,
-            ".json",
-            None,
-            pytest.raises(RuntimeError, match="The old syntax for @pytask.mark.julia"),
-            Mark(
-                "julia",
-                (),
-                {
-                    "script": None,
-                    "options": [],
-                    "serializer": None,
-                    "suffix": ".json",
-                    "project": None,
-                },
-            ),
-        ),
-        (
-            Mark("julia", ("-o"), {}),
-            [],
-            None,
-            ".json",
-            None,
-            pytest.raises(RuntimeError, match="The old syntax for @pytask.mark.julia"),
-            None,
-        ),
         (
             Mark("julia", (), {"script": "script.jl"}),
             [],
@@ -85,7 +57,7 @@ from tests.conftest import ROOT
                     "script": "script.jl",
                     "options": [],
                     "serializer": "json",
-                    "suffix": SERIALIZER["json"]["suffix"],
+                    "suffix": SERIALIZERS["json"]["suffix"],
                     "project": "some_path",
                 },
             ),

@@ -14,7 +14,7 @@ from pytask import parse_nodes
 from pytask import produces
 from pytask import remove_marks
 from pytask import Task
-from pytask_julia.serialization import SERIALIZER
+from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import julia
 from pytask_julia.shared import parse_relative_path
 
@@ -122,9 +122,9 @@ def _parse_julia_mark(
 
     if (
         isinstance(parsed_kwargs["serializer"], str)
-        and parsed_kwargs["serializer"] in SERIALIZER
+        and parsed_kwargs["serializer"] in SERIALIZERS
     ):
-        proposed_suffix = SERIALIZER[parsed_kwargs["serializer"]]["suffix"]
+        proposed_suffix = SERIALIZERS[parsed_kwargs["serializer"]]["suffix"]
     else:
         proposed_suffix = default_suffix
     parsed_kwargs["suffix"] = suffix if suffix else proposed_suffix
