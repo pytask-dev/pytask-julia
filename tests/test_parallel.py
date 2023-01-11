@@ -33,7 +33,7 @@ parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_files_w_parametrize(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -92,7 +92,7 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
     assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
-    for name in ["1.csv", "2.csv"]:
+    for name in ("1.csv", "2.csv"):
         tmp_path.joinpath(name).unlink()
 
     start = time.time()
@@ -104,7 +104,7 @@ def test_parallel_parametrization_over_source_files_w_parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_files_w_loop(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -151,7 +151,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
     assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
-    for name in ["1.csv", "2.csv"]:
+    for name in ("1.csv", "2.csv"):
         tmp_path.joinpath(name).unlink()
 
     start = time.time()
@@ -163,7 +163,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_file_w_parametrize(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -200,7 +200,7 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
     assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
-    for name in ["0.csv", "1.csv"]:
+    for name in ("0.csv", "1.csv"):
         tmp_path.joinpath(name).unlink()
 
     start = time.time()
@@ -212,7 +212,7 @@ def test_parallel_parametrization_over_source_file_w_parametrize(
 
 
 @needs_julia
-@pytest.mark.end_to_end
+@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_file_w_loop(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -252,7 +252,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
     assert result.exit_code == ExitCode.OK
     duration_normal = time.time() - start
 
-    for name in ["0.csv", "1.csv"]:
+    for name in ("0.csv", "1.csv"):
         tmp_path.joinpath(name).unlink()
 
     start = time.time()

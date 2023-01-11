@@ -9,7 +9,7 @@ from pytask_julia.shared import parse_relative_path
 
 
 @hookimpl
-def pytask_parse_config(config):
+def pytask_parse_config(config: dict[str, Any]) -> None:
     """Register the julia marker."""
     config["markers"]["julia"] = "Tasks which are executed with Julia."
     config["julia_serializer"] = config.get("julia_serializer", "json")
@@ -35,5 +35,4 @@ def _parse_value_or_whitespace_option(value: Any) -> None | list[str]:
         return None
     if isinstance(value, list):
         return list(map(str, value))
-    else:
-        raise ValueError(f"'julia_options' is {value} and not a list.")
+    raise ValueError(f"'julia_options' is {value} and not a list.")

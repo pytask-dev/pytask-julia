@@ -1,6 +1,8 @@
+"""This module contains shared functions."""
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 from typing import Callable
 from typing import Iterable
 from typing import Sequence
@@ -9,7 +11,7 @@ from typing import Sequence
 def julia(
     script: str | Path,
     options: str | Iterable[str] | None = None,
-    serializer: str | Callable[..., str] | str | None = None,
+    serializer: Callable[..., str] | str | None = None,
     suffix: str | None = None,
     project: str | Path = None,
 ) -> tuple[
@@ -43,7 +45,7 @@ def julia(
     return script, options, serializer, suffix, project
 
 
-def _to_list(scalar_or_iter):
+def _to_list(scalar_or_iter: Any) -> list[Any]:
     """Convert scalars and iterables to list.
 
     Parameters

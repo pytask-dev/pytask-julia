@@ -11,10 +11,17 @@ from pytask_julia.collect import SERIALIZERS
 from tests.conftest import ROOT
 
 
-@pytest.mark.unit
+@pytest.mark.unit()
 @pytest.mark.parametrize(
-    "mark, default_options, default_serializer, default_suffix, default_project, "
-    "expectation, expected",
+    (
+        "mark",
+        "default_options",
+        "default_serializer",
+        "default_suffix",
+        "default_project",
+        "expectation",
+        "expected",
+    ),
     [
         (
             Mark("julia", (), {"script": "script.jl"}),
@@ -80,9 +87,9 @@ def test_parse_julia_mark(
         assert out == expected
 
 
-@pytest.mark.unit
+@pytest.mark.unit()
 @pytest.mark.parametrize(
-    "project, root, expected",
+    ("project", "root", "expected"),
     [
         (None, ROOT, []),
     ],
