@@ -23,10 +23,10 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     """Make sure that the task setup raises errors."""
     # Act like julia is installed since we do not test this.
     monkeypatch.setattr(
-        "pytask_julia.execute.shutil.which", lambda x: None  # noqa: ARG005
+        "pytask_julia.execute.shutil.which", lambda x: None,  # noqa: ARG005
     )
     task = Task(
-        base_name="example", path=Path(), function=None, markers=[Mark("julia", (), {})]
+        base_name="example", path=Path(), function=None, markers=[Mark("julia", (), {})],
     )
     with pytest.raises(RuntimeError, match="julia is needed"):
         pytask_execute_task_setup(task)
@@ -37,7 +37,7 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize("depends_on", ["'in_1.txt'", "['in_1.txt', 'in_2.txt']"])
 def test_run_jl_script(
-    runner, tmp_path, parse_config_code, serializer, suffix, depends_on
+    runner, tmp_path, parse_config_code, serializer, suffix, depends_on,
 ):
     task_source = f"""
     import pytask
@@ -75,7 +75,7 @@ def test_run_jl_script(
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
     assert tmp_path.joinpath(
-        ".pytask", "task_dummy_py_task_run_jl_script" + suffix
+        ".pytask", "task_dummy_py_task_run_jl_script" + suffix,
     ).exists()
 
 
@@ -83,7 +83,7 @@ def test_run_jl_script(
 @pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_task_decorator(
-    runner, tmp_path, parse_config_code, serializer, suffix
+    runner, tmp_path, parse_config_code, serializer, suffix,
 ):
     task_source = f"""
     import pytask
@@ -118,7 +118,7 @@ def test_run_jl_script_w_task_decorator(
 @pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_raise_error_if_julia_is_not_found(
-    tmp_path, monkeypatch, parse_config_code, serializer, suffix
+    tmp_path, monkeypatch, parse_config_code, serializer, suffix,
 ):
     task_source = f"""
     import pytask
@@ -146,7 +146,7 @@ def test_raise_error_if_julia_is_not_found(
 
     # Hide julia if available.
     monkeypatch.setattr(
-        "pytask_julia.execute.shutil.which", lambda x: None  # noqa: ARG005
+        "pytask_julia.execute.shutil.which", lambda x: None,  # noqa: ARG005
     )
 
     session = main({"paths": tmp_path})
@@ -159,7 +159,7 @@ def test_raise_error_if_julia_is_not_found(
 @pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_wrong_cmd_option(
-    runner, tmp_path, parse_config_code, serializer, suffix
+    runner, tmp_path, parse_config_code, serializer, suffix,
 ):
     task_source = f"""
     import pytask
@@ -195,7 +195,7 @@ def test_run_jl_script_w_wrong_cmd_option(
 @pytest.mark.parametrize("n_threads", [2, 3])
 @parametrize_parse_code_serializer_suffix
 def test_check_passing_cmd_line_options(
-    runner, tmp_path, n_threads, parse_config_code, serializer, suffix
+    runner, tmp_path, n_threads, parse_config_code, serializer, suffix,
 ):
     task_source = f"""
     import pytask
@@ -242,7 +242,7 @@ def test_check_passing_cmd_line_options(
 )
 @pytest.mark.parametrize("path", [ROOT, "relative_from_config"])
 def test_run_jl_script_w_environment_in_config(
-    runner, tmp_path, parse_config_code, serializer, suffix, config_path, value, path
+    runner, tmp_path, parse_config_code, serializer, suffix, config_path, value, path,
 ):
     task_source = f"""
     import pytask
@@ -279,7 +279,7 @@ def test_run_jl_script_w_environment_in_config(
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
     assert tmp_path.joinpath(
-        ".pytask", "task_dummy_py_task_run_jl_script" + suffix
+        ".pytask", "task_dummy_py_task_run_jl_script" + suffix,
     ).exists()
 
 
@@ -291,7 +291,7 @@ def test_run_jl_script_w_environment_in_config(
 )
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_environment_relative_to_task(
-    runner, tmp_path, parse_config_code, serializer, suffix
+    runner, tmp_path, parse_config_code, serializer, suffix,
 ):
     project_in_task = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
 
@@ -324,7 +324,7 @@ def test_run_jl_script_w_environment_relative_to_task(
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
     assert tmp_path.joinpath(
-        ".pytask", "task_dummy_py_task_run_jl_script" + suffix
+        ".pytask", "task_dummy_py_task_run_jl_script" + suffix,
     ).exists()
 
 

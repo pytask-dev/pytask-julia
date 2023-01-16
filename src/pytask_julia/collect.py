@@ -27,7 +27,7 @@ _SEPARATOR: str = "--"
 
 
 def run_jl_script(
-    script: Path, options: list[str], serialized: Path, project: list[str]
+    script: Path, options: list[str], serialized: Path, project: list[str],
 ) -> None:
     """Run a Julia script."""
     cmd = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
@@ -37,7 +37,7 @@ def run_jl_script(
 
 @hookimpl
 def pytask_collect_task(
-    session: Session, path: Path, name: str, obj: Any
+    session: Session, path: Path, name: str, obj: Any,
 ) -> Task | None:
     """Collect a task which is a function.
 
@@ -59,7 +59,7 @@ def pytask_collect_task(
         if len(marks) > 1:
             raise ValueError(
                 f"Task {name!r} has multiple @pytask.mark.julia marks, but only one is "
-                "allowed."
+                "allowed.",
             )
 
         julia_mark = _parse_julia_mark(
@@ -90,7 +90,7 @@ def pytask_collect_task(
         )
 
         script_node = session.hook.pytask_collect_node(
-            session=session, path=path, node=script
+            session=session, path=path, node=script,
         )
 
         if isinstance(task.depends_on, dict):

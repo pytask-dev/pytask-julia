@@ -16,11 +16,11 @@ def pytask_parse_config(config: dict[str, Any]) -> None:
     if config["julia_serializer"] not in SERIALIZERS:
         raise ValueError(
             f"'julia_serializer' is {config['julia_serializer']} and not one of "
-            f"{list(SERIALIZERS)}."
+            f"{list(SERIALIZERS)}.",
         )
     config["julia_suffix"] = config.get("julia_suffix", "")
     config["julia_options"] = _parse_value_or_whitespace_option(
-        config.get("julia_options")
+        config.get("julia_options"),
     )
     project = config.get("julia_project")
     if project is None:

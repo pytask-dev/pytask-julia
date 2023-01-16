@@ -82,7 +82,7 @@ def test_parse_julia_mark(
 ):
     with expectation:
         out = _parse_julia_mark(
-            mark, default_options, default_serializer, default_suffix, default_project
+            mark, default_options, default_serializer, default_suffix, default_project,
         )
         assert out == expected
 
