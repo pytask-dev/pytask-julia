@@ -8,6 +8,9 @@ from typing import Iterable
 from typing import Sequence
 
 
+JULIA_SCRIPT_KEY = "__script"
+
+
 def julia(
     script: str | Path,
     options: str | Iterable[str] | None = None,

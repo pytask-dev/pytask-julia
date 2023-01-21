@@ -11,7 +11,8 @@ ROOT = Path(__file__).parent.joinpath("..").resolve()
 
 
 needs_julia = pytest.mark.skipif(
-    shutil.which("julia") is None, reason="julia needs to be installed."
+    shutil.which("julia") is None,
+    reason="julia needs to be installed.",
 )
 
 
