@@ -19,6 +19,7 @@ from pytask import Session
 from pytask import Task
 from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import julia
+from pytask_julia.shared import JULIA_SCRIPT_KEY
 from pytask_julia.shared import parse_relative_path
 
 
@@ -27,7 +28,10 @@ _SEPARATOR: str = "--"
 
 
 def run_jl_script(
-    script: Path, options: list[str], serialized: Path, project: list[str],
+    script: Path,
+    options: list[str],
+    serialized: Path,
+    project: list[str],
 ) -> None:
     """Run a Julia script."""
     cmd = ["julia"] + options + project + [_SEPARATOR, str(script), str(serialized)]
@@ -37,7 +41,10 @@ def run_jl_script(
 
 @hookimpl
 def pytask_collect_task(
-    session: Session, path: Path, name: str, obj: Any,
+    session: Session,
+    path: Path,
+    name: str,
+    obj: Any,
 ) -> Task | None:
     """Collect a task which is a function.
 
@@ -90,21 +97,23 @@ def pytask_collect_task(
         )
 
         script_node = session.hook.pytask_collect_node(
-            session=session, path=path, node=script,
+            session=session,
+            path=path,
+            node=script,
         )
 
         if isinstance(task.depends_on, dict):
-            task.depends_on["__script"] = script_node
+            task.depends_on[JULIA_SCRIPT_KEY] = script_node
             task.attributes["julia_keep_dict"] = True
         else:
-            task.depends_on = {0: task.depends_on, "__script": script_node}
+            task.depends_on = {0: task.depends_on, JULIA_SCRIPT_KEY: script_node}
             task.attributes["julia_keep_dict"] = False
 
         parsed_project = _parse_project(project, task.path.parent)
 
         task.function = functools.partial(
             task.function,
-            script=task.depends_on["__script"].path,
+            script=task.depends_on[JULIA_SCRIPT_KEY].path,
             options=options,
             project=parsed_project,
         )
