@@ -1,12 +1,15 @@
 """Register hook specifications and implementations."""
 from __future__ import annotations
 
-from pluggy import PluginManager
 from pytask import hookimpl
 from pytask_julia import collect
 from pytask_julia import config
 from pytask_julia import execute
 from pytask_julia import parametrize
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pluggy import PluginManager
 
 
 @hookimpl

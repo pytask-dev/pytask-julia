@@ -16,11 +16,11 @@ def julia(
     options: str | Iterable[str] | None = None,
     serializer: Callable[..., str] | str | None = None,
     suffix: str | None = None,
-    project: str | Path = None,
+    project: str | Path | None = None,
 ) -> tuple[
     str | Path | None,
     str | Iterable[str] | None,
-    str | Callable[..., str] | str | None,
+    str | Callable[..., str] | None,
     str | None,
     str | Path | None,
 ]:
