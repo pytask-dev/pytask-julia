@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 import subprocess
-import types
+import warnings
 from pathlib import Path
 from typing import Any
 from typing import Callable
@@ -11,12 +11,17 @@ from typing import Callable
 from pytask import depends_on
 from pytask import has_mark
 from pytask import hookimpl
+from pytask import is_task_function
 from pytask import Mark
-from pytask import parse_nodes
+from pytask import NodeInfo
+from pytask import parse_dependencies_from_task_function
+from pytask import parse_products_from_task_function
+from pytask import PathNode
 from pytask import produces
 from pytask import remove_marks
 from pytask import Session
 from pytask import Task
+from pytask import TaskWithoutPath
 from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import julia
 from pytask_julia.shared import JULIA_SCRIPT_KEY
@@ -32,6 +37,7 @@ def run_jl_script(
     options: list[str],
     serialized: Path,
     project: list[str],
+    **kwargs: Any,
 ) -> None:
     """Run a Julia script."""
     cmd = ["julia", *options, *project, _SEPARATOR, str(script), str(serialized)]
@@ -46,23 +52,16 @@ def pytask_collect_task(
     name: str,
     obj: Any,
 ) -> Task | None:
-    """Collect a task which is a function.
-
-    There is some discussion on how to detect functions in this `thread
-
-    <https://stackoverflow.com/q/624926/7523785>`_. :class:`types.FunctionType`
-    does notdetect built-ins which is not possible anyway.
-
-    """
+    """Collect a task which is a function."""
     __tracebackhide__ = True
 
     if (
         (name.startswith("task_") or has_mark(obj, "task"))
-        and callable(obj)
+        and is_task_function(obj)
         and has_mark(obj, "julia")
     ):
+        # Parse the @pytask.mark.julia decorator.
         obj, marks = remove_marks(obj, "julia")
-
         if len(marks) > 1:
             raise ValueError(
                 f"Task {name!r} has multiple @pytask.mark.julia marks, but only one is "
@@ -80,43 +79,67 @@ def pytask_collect_task(
 
         obj.pytask_meta.markers.append(julia_mark)
 
-        dependencies = parse_nodes(session, path, name, obj, depends_on)
-        products = parse_nodes(session, path, name, obj, produces)
+        # Collect the nodes in @pytask.mark.julia and validate them.
+        path_nodes = Path.cwd() if path is None else path.parent
 
-        markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
-        kwargs = obj.pytask_meta.kwargs if hasattr(obj, "pytask_meta") else {}
-
-        task = Task(
-            base_name=name,
-            path=path,
-            function=_copy_func(run_jl_script),  # type: ignore[arg-type]
-            depends_on=dependencies,
-            produces=products,
-            markers=markers,
-            kwargs=kwargs,
-        )
+        if isinstance(script, str):
+            warnings.warn(
+                "Passing a string for the latex parameter 'script' is deprecated. "
+                "Please, use a pathlib.Path instead.",
+                stacklevel=1,
+            )
+            script = Path(script)
 
         script_node = session.hook.pytask_collect_node(
             session=session,
-            path=path,
-            node=script,
+            path=path_nodes,
+            node_info=NodeInfo(
+                arg_name="script", path=(), value=script, task_path=path, task_name=name
+            ),
         )
 
-        if isinstance(task.depends_on, dict):
-            task.depends_on[JULIA_SCRIPT_KEY] = script_node
-            task.attributes["julia_keep_dict"] = True
-        else:
-            task.depends_on = {0: task.depends_on, JULIA_SCRIPT_KEY: script_node}
-            task.attributes["julia_keep_dict"] = False
+        if not (isinstance(script_node, PathNode) and script_node.path.suffix == ".jl"):
+            raise ValueError(
+                "The 'script' keyword of the @pytask.mark.julia decorator must point "
+                f"to Julia file with the .jl suffix, but it is {script_node}."
+            )
 
-        parsed_project = _parse_project(project, task.path.parent)
+        dependencies = parse_dependencies_from_task_function(
+            session, path, name, path_nodes, obj
+        )
+        products = parse_products_from_task_function(session, path, name, path_nodes, obj)
 
-        task.function = functools.partial(
-            task.function,
-            script=task.depends_on[JULIA_SCRIPT_KEY].path,
+        # Add script
+        dependencies[JULIA_SCRIPT_KEY] = script_node
+
+        markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
+
+        parsed_project = _parse_project(project, path_nodes)
+
+        task_function = functools.partial(
+            run_jl_script,
+            script=script_node.path,
             options=options,
             project=parsed_project,
         )
+
+        if path is None:
+            task = TaskWithoutPath(
+                name=name,
+                function=task_function,
+                depends_on=dependencies,
+                produces=products,
+                markers=markers,
+            )
+        else:
+            task = Task(
+                base_name=name,
+                path=path,
+                function=task_function,
+                depends_on=dependencies,
+                produces=products,
+                markers=markers,
+            )
 
         return task
     return None
@@ -155,31 +178,6 @@ def _parse_julia_mark(
 
     mark = Mark("julia", (), parsed_kwargs)
     return mark
-
-
-def _copy_func(func: types.FunctionType) -> types.FunctionType:
-    """Create a copy of a function.
-
-    Based on https://stackoverflow.com/a/13503277/7523785.
-
-    Example
-    -------
-    >>> def _func(): pass
-    >>> copied_func = _copy_func(_func)
-    >>> _func is copied_func
-    False
-
-    """
-    new_func = types.FunctionType(
-        func.__code__,
-        func.__globals__,
-        name=func.__name__,
-        argdefs=func.__defaults__,
-        closure=func.__closure__,
-    )
-    new_func = functools.update_wrapper(new_func, func)
-    new_func.__kwdefaults__ = func.__kwdefaults__
-    return new_func
 
 
 def _parse_project(project: str | Path | None, root: Path) -> list[str]:

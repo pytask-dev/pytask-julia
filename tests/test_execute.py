@@ -6,9 +6,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from pytask import build
 from pytask import cli
 from pytask import ExitCode
-from pytask import main
 from pytask import Mark
 from pytask import Task
 from pytask_julia.execute import pytask_execute_task_setup
@@ -72,6 +72,8 @@ def test_run_jl_script(
     else
         throw(DomainError("No dependencies"))
     end
+    println(config)
+    println(config["produces"])
     write(
         config["produces"],
         "Crying helps me to slow down and obsess over the weight of life's problems."
@@ -168,7 +170,7 @@ def test_raise_error_if_julia_is_not_found(
         lambda x: None,  # noqa: ARG005
     )
 
-    session = main({"paths": tmp_path})
+    session = build(paths=tmp_path)
 
     assert session.exit_code == ExitCode.FAILED
     assert isinstance(session.execution_reports[0].exc_info[1], RuntimeError)
