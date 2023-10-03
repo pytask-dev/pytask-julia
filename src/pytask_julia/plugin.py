@@ -7,7 +7,6 @@ from pytask import hookimpl
 from pytask_julia import collect
 from pytask_julia import config
 from pytask_julia import execute
-from pytask_julia import parametrize
 
 if TYPE_CHECKING:
     from pluggy import PluginManager
@@ -19,4 +18,3 @@ def pytask_add_hooks(pm: PluginManager) -> None:
     pm.register(collect)
     pm.register(config)
     pm.register(execute)
-    pm.register(parametrize)

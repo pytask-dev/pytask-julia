@@ -50,10 +50,12 @@ task module to the Julia script.
 
 ```python
 import pytask
+from pathlib import Path
+from pytask import task
 
 
+@task(kwargs={"path": Path("out.csv")})
 @pytask.mark.julia(script="script.jl")
-@pytask.mark.produces("out.csv")
 def task_run_jl_script():
     pass
 ```
@@ -64,10 +66,11 @@ more information.
 
 ### Dependencies and Products
 
-Dependencies and products can be added as with a normal pytask task using the
-`@pytask.mark.depends_on` and `@pytask.mark.produces` decorators. which is explained in
-this
+Dependencies and products can be added as usual. Read this
 [tutorial](https://pytask-dev.readthedocs.io/en/stable/tutorials/defining_dependencies_products.html).
+
+For example, with the `@pytask.task` decorator as shown before. (The choice of the kwarg
+name, here `path`, is arbitrary.)
 
 ### Accessing dependencies and products in the script
 
@@ -82,7 +85,7 @@ path_to_json = ARGS[1]  # Contains the path to the .json file.
 
 config = JSON.parse(read(path_to_json, String))  # A dictionary.
 
-config["produces"]  # Is the path to the output file "../out.csv".
+config["path"]  # Is the path to the output file "../out.csv".
 ```
 
 The `.json` file is stored in the same folder as the task in a `.pytask` directory.
@@ -94,9 +97,8 @@ You can also pass any other information to your script by using the `@pytask.mar
 decorator.
 
 ```python
-@pytask.mark.task(kwargs={"number": 1})
+@pytask.mark.task(kwargs={"path": Path("out.csv"), "number": 1})
 @pytask.mark.julia(script="script.jl")
-@pytask.mark.produces("out.csv")
 def task_run_jl_script():
     pass
 ```
@@ -141,8 +143,8 @@ You can also define environments for each task which will overwrite any other de
 with the `project` keyword argument. Pass a path to the task module.
 
 ```python
+@task(kwargs={"path": Path("out.csv")})
 @pytask.mark.julia(script="script.jl", project=".")
-@pytask.mark.produces("out.csv")
 def task_run_jl_script():
     pass
 ```
@@ -152,8 +154,8 @@ def task_run_jl_script():
 Command line options can be pass via the `options` keyword argument.
 
 ```python
+@task(kwargs={"path": Path("out.csv")})
 @pytask.mark.julia(script="script.jl", options=["--threads", "2"])
-@pytask.mark.produces("out.csv")
 def task_run_jl_script():
     pass
 ```
@@ -171,9 +173,8 @@ produce different outputs.
 ```python
 for i in range(2):
 
-    @pytask.mark.task
+    @task(kwargs={"path": Path(f"out_{i}.csv")})
     @pytask.mark.julia(script=f"script_{i}.jl")
-    @pytask.mark.produces(f"out_{i}.csv")
     def task_execute_julia_script():
         pass
 ```
@@ -184,9 +185,8 @@ the `kwargs` keyword of the `@pytask.mark.task` decorator.
 ```python
 for i in range(2):
 
-    @pytask.mark.task(kwargs={"i": i})
+    @pytask.mark.task(kwargs={"path": Path(f"out_{i}.csv"), "i": i})
     @pytask.mark.julia(script="script.jl")
-    @pytask.mark.produces(f"output_{i}.csv")
     def task_execute_julia_script():
         pass
 ```
@@ -200,7 +200,7 @@ path_to_json = ARGS[1]  # Contains the path to the .json file.
 
 config = JSON.parse(read(path_to_json, String))  # A dictionary.
 
-config["produces"]  # Is the path to the output file "../output_{i}.csv".
+config["path"]  # Is the path to the output file "../output_{i}.csv".
 
 config["i"]  # Is the number.
 ```

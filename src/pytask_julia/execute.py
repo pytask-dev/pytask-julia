@@ -44,14 +44,14 @@ def pytask_execute_task_setup(task: Task) -> None:
 def collect_keyword_arguments(task: Task) -> dict[str, Any]:
     """Collect keyword arguments for function."""
     kwargs = {
-        "depends_on": tree_map(
+        **tree_map(
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
             task.depends_on,
         ),
-        "produces": tree_map(
+        **tree_map(
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
             task.produces,
         ),
     }
-    kwargs["depends_on"].pop(JULIA_SCRIPT_KEY)
+    kwargs.pop(JULIA_SCRIPT_KEY)
     return kwargs
