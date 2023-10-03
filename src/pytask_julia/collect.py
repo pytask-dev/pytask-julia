@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
-from pytask import depends_on
 from pytask import has_mark
 from pytask import hookimpl
 from pytask import is_task_function
@@ -17,7 +16,6 @@ from pytask import NodeInfo
 from pytask import parse_dependencies_from_task_function
 from pytask import parse_products_from_task_function
 from pytask import PathNode
-from pytask import produces
 from pytask import remove_marks
 from pytask import Session
 from pytask import Task
@@ -107,7 +105,9 @@ def pytask_collect_task(
         dependencies = parse_dependencies_from_task_function(
             session, path, name, path_nodes, obj
         )
-        products = parse_products_from_task_function(session, path, name, path_nodes, obj)
+        products = parse_products_from_task_function(
+            session, path, name, path_nodes, obj
+        )
 
         # Add script
         dependencies[JULIA_SCRIPT_KEY] = script_node
