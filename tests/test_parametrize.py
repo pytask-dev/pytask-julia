@@ -7,7 +7,8 @@ from pytask import cli
 from pytask import ExitCode
 
 from tests.conftest import needs_julia
-from tests.conftest import ROOT, parametrize_parse_code_serializer_suffix
+from tests.conftest import parametrize_parse_code_serializer_suffix
+from tests.conftest import ROOT
 
 
 @needs_julia

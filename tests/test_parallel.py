@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import textwrap
-import time
 
 import pytest
 from pytask import cli
 from pytask import ExitCode
 
 from tests.conftest import needs_julia
-from tests.conftest import ROOT, parametrize_parse_code_serializer_suffix
+from tests.conftest import parametrize_parse_code_serializer_suffix
+from tests.conftest import ROOT
 
 try:
     import pytask_parallel  # noqa: F401
