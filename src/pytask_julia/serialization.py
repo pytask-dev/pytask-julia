@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 from typing import Callable
+from typing import TYPE_CHECKING
 
-from pytask import Task
+
+if TYPE_CHECKING:
+    from pytask import Task
+    from pathlib import Path
 
 
 _HIDDEN_FOLDER = ".pytask"

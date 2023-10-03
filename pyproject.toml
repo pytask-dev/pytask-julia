@@ -25,10 +25,12 @@ ignore_errors = true
 
 
 [tool.ruff]
-target-version = "py37"
+target-version = "py38"
 select = ["ALL"]
 fix = true
 extend-ignore = [
+    "I",  # ignore isort
+    "TRY",  # ignore tryceratops
     # Numpy docstyle
     "D107",
     "D203",
@@ -44,7 +46,6 @@ extend-ignore = [
     "RET504",  # unnecessary variable assignment before return.
     "S101",  # raise errors for asserts.
     "B905",  # strict parameter for zip that was implemented in py310.
-    "I",  # ignore isort
     "ANN101",  # type annotating self
     "ANN102",  # type annotating cls
     "FBT",  # flake8-boolean-trap
@@ -56,7 +57,7 @@ extend-ignore = [
 
 
 [tool.ruff.per-file-ignores]
-"tests/*" = ["D", "ANN", "PLR2004"]
+"tests/*" = ["D", "ANN", "PLR2004", "PLR0913"]
 
 
 [tool.ruff.pydocstyle]

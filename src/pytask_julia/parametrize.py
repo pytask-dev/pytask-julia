@@ -10,5 +10,5 @@ from pytask import hookimpl
 @hookimpl
 def pytask_parametrize_kwarg_to_marker(obj: Any, kwargs: dict[str, Any]) -> None:
     """Attach parametrized Julia arguments to the function with a marker."""
-    if callable(obj) and "julia" in kwargs:  # noqa: PLR2004
+    if callable(obj) and "julia" in kwargs:
         pytask.mark.julia(**kwargs.pop("julia"))(obj)
