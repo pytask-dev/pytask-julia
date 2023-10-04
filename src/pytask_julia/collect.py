@@ -35,7 +35,7 @@ def run_jl_script(
     options: list[str],
     serialized: Path,
     project: list[str],
-    **kwargs: Any,
+    **kwargs: Any,  # noqa: ARG001
 ) -> None:
     """Run a Julia script."""
     cmd = ["julia", *options, *project, _SEPARATOR, str(script), str(serialized)]
