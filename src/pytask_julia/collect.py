@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
-from pytask import PTask, has_mark
+from pytask import has_mark
 from pytask import hookimpl
 from pytask import is_task_function
 from pytask import Mark
@@ -16,6 +16,7 @@ from pytask import NodeInfo
 from pytask import parse_dependencies_from_task_function
 from pytask import parse_products_from_task_function
 from pytask import PathNode
+from pytask import PTask
 from pytask import remove_marks
 from pytask import Session
 from pytask import Task
