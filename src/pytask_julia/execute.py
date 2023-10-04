@@ -5,8 +5,8 @@ import functools
 import shutil
 from typing import Any
 
-from pybaum.tree_util import tree_map
-from pytask import get_marks
+from pytask.tree_util import tree_map
+from pytask import PTask, get_marks
 from pytask import hookimpl
 from pytask import PPathNode
 from pytask import Task
@@ -17,7 +17,7 @@ from pytask_julia.shared import JULIA_SCRIPT_KEY
 
 
 @hookimpl
-def pytask_execute_task_setup(task: Task) -> None:
+def pytask_execute_task_setup(task: PTask) -> None:
     """Check whether environment allows executing Julia files."""
     marks = get_marks(task, "julia")
     if marks:
@@ -31,6 +31,9 @@ def pytask_execute_task_setup(task: Task) -> None:
 
         _, _, serializer, suffix, _ = julia(**marks[0].kwargs)
 
+        assert serializer
+        assert suffix
+
         path_to_serialized = create_path_to_serialized(task, suffix)
         path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
         task.function = functools.partial(
@@ -41,14 +44,14 @@ def pytask_execute_task_setup(task: Task) -> None:
         serialize_keyword_arguments(serializer, path_to_serialized, kwargs)
 
 
-def collect_keyword_arguments(task: Task) -> dict[str, Any]:
+def collect_keyword_arguments(task: PTask) -> dict[str, Any]:
     """Collect keyword arguments for function."""
-    kwargs = {
-        **tree_map(
+    kwargs: dict[str, Any] = {
+        **tree_map(  # type: ignore[dict-item]
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
             task.depends_on,
         ),
-        **tree_map(
+        **tree_map(  # type: ignore[dict-item]
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
             task.produces,
         ),

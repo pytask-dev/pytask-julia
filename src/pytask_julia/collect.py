@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
-from pytask import has_mark
+from pytask import PTask, has_mark
 from pytask import hookimpl
 from pytask import is_task_function
 from pytask import Mark
@@ -46,10 +46,10 @@ def run_jl_script(
 @hookimpl
 def pytask_collect_task(
     session: Session,
-    path: Path,
+    path: Path | None,
     name: str,
     obj: Any,
-) -> Task | None:
+) -> PTask | None:
     """Collect a task which is a function."""
     __tracebackhide__ = True
 
@@ -66,24 +66,24 @@ def pytask_collect_task(
                 "allowed.",
             )
 
-        julia_mark = _parse_julia_mark(
+        mark = _parse_julia_mark(
             mark=marks[0],
             default_options=session.config["julia_options"],
             default_serializer=session.config["julia_serializer"],
             default_suffix=session.config["julia_suffix"],
             default_project=session.config["julia_project"],
         )
-        script, options, _, _, project = julia(**julia_mark.kwargs)
+        script, options, _, _, project = julia(**mark.kwargs)
 
-        obj.pytask_meta.markers.append(julia_mark)
+        obj.pytask_meta.markers.append(mark)
 
         # Collect the nodes in @pytask.mark.julia and validate them.
         path_nodes = Path.cwd() if path is None else path.parent
 
         if isinstance(script, str):
             warnings.warn(
-                "Passing a string for the latex parameter 'script' is deprecated. "
-                "Please, use a pathlib.Path instead.",
+                "Passing a string to the @pytask.mark.julia parameter 'script' is "
+                "deprecated. Please, use a pathlib.Path instead.",
                 stacklevel=1,
             )
             script = Path(script)
@@ -123,6 +123,7 @@ def pytask_collect_task(
             project=parsed_project,
         )
 
+        task: PTask
         if path is None:
             task = TaskWithoutPath(
                 name=name,
