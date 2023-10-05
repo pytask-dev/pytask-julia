@@ -1,19 +1,17 @@
 """Execute tasks."""
 from __future__ import annotations
 
-import functools
 import shutil
 from typing import Any
 
-from pytask.tree_util import tree_map
-from pytask import PTask, get_marks
+from pytask import get_marks
 from pytask import hookimpl
 from pytask import PPathNode
-from pytask import Task
-from pytask_julia.serialization import create_path_to_serialized
+from pytask import PTask
+from pytask import PythonNode
+from pytask.tree_util import tree_map
 from pytask_julia.serialization import serialize_keyword_arguments
 from pytask_julia.shared import julia
-from pytask_julia.shared import JULIA_SCRIPT_KEY
 
 
 @hookimpl
@@ -32,16 +30,12 @@ def pytask_execute_task_setup(task: PTask) -> None:
         _, _, serializer, suffix, _ = julia(**marks[0].kwargs)
 
         assert serializer
-        assert suffix
+        assert suffix is not None
 
-        path_to_serialized = create_path_to_serialized(task, suffix)
-        path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
-        task.function = functools.partial(
-            task.function,
-            serialized=path_to_serialized,
-        )
+        serialized_node: PythonNode = task.depends_on["_serialized"]  # type: ignore[assignment]
+        serialized_node.value.parent.mkdir(parents=True, exist_ok=True)
         kwargs = collect_keyword_arguments(task)
-        serialize_keyword_arguments(serializer, path_to_serialized, kwargs)
+        serialize_keyword_arguments(serializer, serialized_node.value, kwargs)
 
 
 def collect_keyword_arguments(task: PTask) -> dict[str, Any]:
@@ -56,5 +50,8 @@ def collect_keyword_arguments(task: PTask) -> dict[str, Any]:
             task.produces,
         ),
     }
-    kwargs.pop(JULIA_SCRIPT_KEY)
+    kwargs.pop("_script")
+    kwargs.pop("_options")
+    kwargs.pop("_project")
+    kwargs.pop("_serialized")
     return kwargs

@@ -1,14 +1,13 @@
 """Collect tasks."""
 from __future__ import annotations
 
-import functools
 import subprocess
 import warnings
 from pathlib import Path
 from typing import Any
 from typing import Callable
 
-from pytask import PTask, has_mark
+from pytask import has_mark
 from pytask import hookimpl
 from pytask import is_task_function
 from pytask import Mark
@@ -16,13 +15,15 @@ from pytask import NodeInfo
 from pytask import parse_dependencies_from_task_function
 from pytask import parse_products_from_task_function
 from pytask import PathNode
+from pytask import PTask
+from pytask import PythonNode
 from pytask import remove_marks
 from pytask import Session
 from pytask import Task
 from pytask import TaskWithoutPath
+from pytask_julia.serialization import create_path_to_serialized
 from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import julia
-from pytask_julia.shared import JULIA_SCRIPT_KEY
 from pytask_julia.shared import parse_relative_path
 
 
@@ -31,14 +32,14 @@ _SEPARATOR: str = "--"
 
 
 def run_jl_script(
-    script: Path,
-    options: list[str],
-    serialized: Path,
-    project: list[str],
+    _script: Path,
+    _options: list[str],
+    _serialized: Path,
+    _project: list[str],
     **kwargs: Any,  # noqa: ARG001
 ) -> None:
     """Run a Julia script."""
-    cmd = ["julia", *options, *project, _SEPARATOR, str(script), str(serialized)]
+    cmd = ["julia", *_options, *_project, _SEPARATOR, str(_script), str(_serialized)]
     print("Executing " + " ".join(cmd) + ".")  # noqa: T201
     subprocess.run(cmd, check=True)  # noqa: S603
 
@@ -73,7 +74,7 @@ def pytask_collect_task(
             default_suffix=session.config["julia_suffix"],
             default_project=session.config["julia_project"],
         )
-        script, options, _, _, project = julia(**mark.kwargs)
+        script, options, _, suffix, project = julia(**mark.kwargs)
 
         obj.pytask_meta.markers.append(mark)
 
@@ -102,6 +103,31 @@ def pytask_collect_task(
                 f"to Julia file with the .jl suffix, but it is {script_node}."
             )
 
+        options_node = session.hook.pytask_collect_node(
+            session=session,
+            path=path_nodes,
+            node_info=NodeInfo(
+                arg_name="_options",
+                path=(),
+                value=options,
+                task_path=path,
+                task_name=name,
+            ),
+        )
+
+        parsed_project = _parse_project(project, path_nodes)
+        project_node = session.hook.pytask_collect_node(
+            session=session,
+            path=path_nodes,
+            node_info=NodeInfo(
+                arg_name="_project",
+                path=(),
+                value=parsed_project,
+                task_path=path,
+                task_name=name,
+            ),
+        )
+
         dependencies = parse_dependencies_from_task_function(
             session, path, name, path_nodes, obj
         )
@@ -110,24 +136,17 @@ def pytask_collect_task(
         )
 
         # Add script
-        dependencies[JULIA_SCRIPT_KEY] = script_node
+        dependencies["_script"] = script_node
+        dependencies["_options"] = options_node
+        dependencies["_project"] = project_node
 
         markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
-
-        parsed_project = _parse_project(project, path_nodes)
-
-        task_function = functools.partial(
-            run_jl_script,
-            script=script_node.path,
-            options=options,
-            project=parsed_project,
-        )
 
         task: PTask
         if path is None:
             task = TaskWithoutPath(
                 name=name,
-                function=task_function,
+                function=run_jl_script,
                 depends_on=dependencies,
                 produces=products,
                 markers=markers,
@@ -136,11 +155,26 @@ def pytask_collect_task(
             task = Task(
                 base_name=name,
                 path=path,
-                function=task_function,
+                function=run_jl_script,
                 depends_on=dependencies,
                 produces=products,
                 markers=markers,
             )
+
+        # Add serialized node that depends on the task id.
+        serialized = create_path_to_serialized(task, suffix)  # type: ignore[arg-type]
+        serialized_node = session.hook.pytask_collect_node(
+            session=session,
+            path=path_nodes,
+            node_info=NodeInfo(
+                arg_name="_serialized",
+                path=(),
+                value=PythonNode(value=serialized),
+                task_path=path,
+                task_name=name,
+            ),
+        )
+        task.depends_on["_serialized"] = serialized_node
 
         return task
     return None

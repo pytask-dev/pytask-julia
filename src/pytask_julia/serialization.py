@@ -2,19 +2,15 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 from typing import Callable
-from typing import TYPE_CHECKING
 
-from pytask import PTask, PTaskWithPath
-
-
-if TYPE_CHECKING:
-    from pytask import Task
-    from pathlib import Path
+from pytask import PTask
+from pytask import PTaskWithPath
 
 
-_HIDDEN_FOLDER = ".pytask"
+_HIDDEN_FOLDER = ".pytask/pytask-julia"
 
 
 SERIALIZERS = {
