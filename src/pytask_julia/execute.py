@@ -1,22 +1,21 @@
 """Execute tasks."""
 from __future__ import annotations
 
-import functools
 import shutil
 from typing import Any
 
-from pybaum.tree_util import tree_map
 from pytask import get_marks
 from pytask import hookimpl
-from pytask import Task
-from pytask_julia.serialization import create_path_to_serialized
+from pytask import PPathNode
+from pytask import PTask
+from pytask import PythonNode
+from pytask.tree_util import tree_map
 from pytask_julia.serialization import serialize_keyword_arguments
 from pytask_julia.shared import julia
-from pytask_julia.shared import JULIA_SCRIPT_KEY
 
 
 @hookimpl
-def pytask_execute_task_setup(task: Task) -> None:
+def pytask_execute_task_setup(task: PTask) -> None:
     """Check whether environment allows executing Julia files."""
     marks = get_marks(task, "julia")
     if marks:
@@ -30,34 +29,29 @@ def pytask_execute_task_setup(task: Task) -> None:
 
         _, _, serializer, suffix, _ = julia(**marks[0].kwargs)
 
-        path_to_serialized = create_path_to_serialized(task, suffix)
-        path_to_serialized.parent.mkdir(parents=True, exist_ok=True)
-        task.function = functools.partial(
-            task.function,
-            serialized=path_to_serialized,
-        )
+        assert serializer
+        assert suffix is not None
+
+        serialized_node: PythonNode = task.depends_on["_serialized"]  # type: ignore[assignment]
+        serialized_node.value.parent.mkdir(parents=True, exist_ok=True)
         kwargs = collect_keyword_arguments(task)
-        serialize_keyword_arguments(serializer, path_to_serialized, kwargs)
+        serialize_keyword_arguments(serializer, serialized_node.value, kwargs)
 
 
-def collect_keyword_arguments(task: Task) -> dict[str, Any]:
+def collect_keyword_arguments(task: PTask) -> dict[str, Any]:
     """Collect keyword arguments for function."""
-    # Remove all kwargs from the task so that they are not passed to the function.
-    kwargs = dict(task.kwargs)
-    task.kwargs = {}
-
-    if len(task.depends_on) == 1 and JULIA_SCRIPT_KEY in task.depends_on:
-        pass
-    elif (
-        not task.attributes["julia_keep_dict"]
-        and len(task.depends_on) == 2  # noqa: PLR2004
-    ):
-        kwargs["depends_on"] = str(task.depends_on[0].value)
-    else:
-        kwargs["depends_on"] = tree_map(lambda x: str(x.value), task.depends_on)
-        kwargs["depends_on"].pop(JULIA_SCRIPT_KEY)
-
-    if task.produces:
-        kwargs["produces"] = tree_map(lambda x: str(x.value), task.produces)
-
+    kwargs: dict[str, Any] = {
+        **tree_map(  # type: ignore[dict-item]
+            lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
+            task.depends_on,
+        ),
+        **tree_map(  # type: ignore[dict-item]
+            lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
+            task.produces,
+        ),
+    }
+    kwargs.pop("_script")
+    kwargs.pop("_options")
+    kwargs.pop("_project")
+    kwargs.pop("_serialized")
     return kwargs

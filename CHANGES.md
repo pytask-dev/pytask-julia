@@ -5,7 +5,11 @@ chronological order. Releases follow [semantic versioning](https://semver.org/) 
 releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia).
 
-## 0.3.0 - 2023-xx-xx
+## 0.4.0 - 2023-10-08
+
+- {pull}`24` prepares the release of pytask v0.4.0.
+
+## 0.3.0 - 2023-01-24
 
 - {pull}`16` adds mypy, refurb, and ruff.
 - {pull}`18` deprecates INI configurations and aligns the package with pytask v0.3.

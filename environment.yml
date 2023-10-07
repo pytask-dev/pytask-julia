@@ -2,6 +2,8 @@ name: pytask-julia
 
 channels:
   - conda-forge
+  - conda-forge/label/pytask_rc
+  - conda-forge/label/pytask_parallel_rc
   - nodefaults
 
 dependencies:
@@ -12,8 +14,8 @@ dependencies:
 
   # Package dependencies
   - julia
-  - pytask >=0.3
-  - pytask-parallel >=0.3
+  - pytask >=0.4.0
+  - pytask-parallel >=0.4.0
 
   # Optional package dependencies
   - pyyaml

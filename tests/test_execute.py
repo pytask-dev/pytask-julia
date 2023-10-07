@@ -6,9 +6,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from pytask import build
 from pytask import cli
 from pytask import ExitCode
-from pytask import main
 from pytask import Mark
 from pytask import Task
 from pytask_julia.execute import pytask_execute_task_setup
@@ -83,28 +83,23 @@ def test_run_jl_script(
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
-    assert tmp_path.joinpath(
-        ".pytask",
-        "task_dummy_py_task_run_jl_script" + suffix,
-    ).exists()
 
 
 @needs_julia
 @pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_task_decorator(
-    runner,
-    tmp_path,
-    parse_config_code,
-    serializer,
-    suffix,
+    runner, tmp_path, parse_config_code, serializer, suffix
 ):
     task_source = f"""
     import pytask
 
     @pytask.mark.task
     @pytask.mark.julia(
-        script="script.jl", serializer="{serializer}", project="{ROOT.as_posix()}"
+        script="script.jl",
+        serializer="{serializer}",
+        suffix="{suffix}",
+        project="{ROOT.as_posix()}"
     )
     @pytask.mark.produces("out.txt")
     def run_jl_script():
@@ -125,7 +120,6 @@ def test_run_jl_script_w_task_decorator(
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
-    assert tmp_path.joinpath(".pytask", "task_dummy_py_run_jl_script" + suffix).exists()
 
 
 @needs_julia
@@ -168,7 +162,7 @@ def test_raise_error_if_julia_is_not_found(
         lambda x: None,  # noqa: ARG005
     )
 
-    session = main({"paths": tmp_path})
+    session = build(paths=tmp_path)
 
     assert session.exit_code == ExitCode.FAILED
     assert isinstance(session.execution_reports[0].exc_info[1], RuntimeError)
@@ -306,10 +300,6 @@ def test_run_jl_script_w_environment_in_config(
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
-    assert tmp_path.joinpath(
-        ".pytask",
-        "task_dummy_py_task_run_jl_script" + suffix,
-    ).exists()
 
 
 @needs_julia
@@ -356,10 +346,6 @@ def test_run_jl_script_w_environment_relative_to_task(
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
-    assert tmp_path.joinpath(
-        ".pytask",
-        "task_dummy_py_task_run_jl_script" + suffix,
-    ).exists()
 
 
 @needs_julia
@@ -393,7 +379,6 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
 
     assert result.exit_code == ExitCode.OK
     assert tmp_path.joinpath("out.txt").exists()
-    assert tmp_path.joinpath(".pytask", "task_dummy_py_task_run_jl_script").exists()
 
 
 @needs_julia

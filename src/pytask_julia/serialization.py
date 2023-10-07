@@ -2,17 +2,15 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 from typing import Callable
-from typing import TYPE_CHECKING
+
+from pytask import PTask
+from pytask import PTaskWithPath
 
 
-if TYPE_CHECKING:
-    from pytask import Task
-    from pathlib import Path
-
-
-_HIDDEN_FOLDER = ".pytask"
+_HIDDEN_FOLDER = ".pytask/pytask-julia"
 
 
 SERIALIZERS = {
@@ -28,15 +26,15 @@ else:
     SERIALIZERS["yml"] = {"serializer": yaml.dump, "suffix": ".yml"}
 
 
-def create_path_to_serialized(task: Task, suffix: str) -> Path:
+def create_path_to_serialized(task: PTask, suffix: str) -> Path:
     """Create path to serialized."""
-    parent = task.path.parent
+    parent = task.path.parent if isinstance(task, PTaskWithPath) else Path.cwd()
     file_name = create_file_name(task, suffix)
     path = parent.joinpath(_HIDDEN_FOLDER, file_name).with_suffix(suffix)
     return path
 
 
-def create_file_name(task: Task, suffix: str) -> str:
+def create_file_name(task: PTask, suffix: str) -> str:
     """Create the file name of the file containing the serialized kwargs.
 
     Some characters need to be escaped since they are not valid characters on file
@@ -44,7 +42,8 @@ def create_file_name(task: Task, suffix: str) -> str:
 
     """
     return (
-        task.short_name.replace("[", "_")
+        getattr(task, "display_name", task.name)
+        .replace("[", "_")
         .replace("]", "_")
         .replace("::", "_")
         .replace(".", "_")
