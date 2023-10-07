@@ -14,8 +14,8 @@ dependencies:
 
   # Package dependencies
   - julia
-  - pytask >=0.4.0rc4
-  - pytask-parallel >=0.4.0rc1
+  - pytask >=0.4.0
+  - pytask-parallel >=0.4.0
 
   # Optional package dependencies
   - pyyaml
