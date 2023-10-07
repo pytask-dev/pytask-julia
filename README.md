@@ -93,11 +93,10 @@ The `.json` file is stored in the same folder as the task in a `.pytask` directo
 To parse the JSON file, you need to install
 [JSON.jl](https://github.com/JuliaIO/JSON.jl).
 
-You can also pass any other information to your script by using the `@pytask.mark.task`
-decorator.
+You can also pass any other information to your script by using the `@task` decorator.
 
 ```python
-@pytask.mark.task(kwargs={"path": Path("out.csv"), "number": 1})
+@task(kwargs={"path": Path("out.csv"), "number": 1})
 @pytask.mark.julia(script="script.jl")
 def task_run_jl_script():
     pass
@@ -180,12 +179,12 @@ for i in range(2):
 ```
 
 If you want to pass different inputs to the same Julia script, pass these arguments with
-the `kwargs` keyword of the `@pytask.mark.task` decorator.
+the `kwargs` keyword of the `@task` decorator.
 
 ```python
 for i in range(2):
 
-    @pytask.mark.task(kwargs={"path": Path(f"out_{i}.csv"), "i": i})
+    @task(kwargs={"path": Path(f"out_{i}.csv"), "i": i})
     @pytask.mark.julia(script="script.jl")
     def task_execute_julia_script():
         pass
