@@ -4,9 +4,9 @@ from contextlib import ExitStack as does_not_raise  # noqa: N813
 
 import pytest
 from pytask import Mark
+from pytask_julia.collect import SERIALIZERS
 from pytask_julia.collect import _parse_julia_mark
 from pytask_julia.collect import _parse_project
-from pytask_julia.collect import SERIALIZERS
 
 from tests.conftest import ROOT
 
@@ -71,7 +71,7 @@ from tests.conftest import ROOT
         ),
     ],
 )
-def test_parse_julia_mark(
+def test_parse_julia_mark(  # noqa: PLR0913
     mark,
     default_options,
     default_serializer,

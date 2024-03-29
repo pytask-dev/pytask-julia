@@ -1,4 +1,4 @@
-"""This module contains shared functions."""
+"""Contains shared functions."""
 
 from __future__ import annotations
 

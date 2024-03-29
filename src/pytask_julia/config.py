@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from pytask import hookimpl
+
 from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.shared import parse_relative_path
 
@@ -15,9 +16,12 @@ def pytask_parse_config(config: dict[str, Any]) -> None:
     config["markers"]["julia"] = "Tasks which are executed with Julia."
     config["julia_serializer"] = config.get("julia_serializer", "json")
     if config["julia_serializer"] not in SERIALIZERS:
-        raise ValueError(
+        msg = (
             f"'julia_serializer' is {config['julia_serializer']} and not one of "
-            f"{list(SERIALIZERS)}.",
+            f"{list(SERIALIZERS)}."
+        )
+        raise ValueError(
+            msg,
         )
     config["julia_suffix"] = config.get("julia_suffix", "")
     config["julia_options"] = _parse_value_or_whitespace_option(
@@ -36,4 +40,5 @@ def _parse_value_or_whitespace_option(value: Any) -> None | list[str]:
         return None
     if isinstance(value, list):
         return list(map(str, value))
-    raise ValueError(f"'julia_options' is {value} and not a list.")
+    msg = f"'julia_options' is {value} and not a list."
+    raise ValueError(msg)

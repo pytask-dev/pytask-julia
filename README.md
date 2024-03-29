@@ -213,7 +213,8 @@ Use the `serializer` keyword arguments of the `@pytask.mark.julia` decorator wit
 
 ```python
 @pytask.mark.julia(script="script.jl", serializer="yaml")
-def task_example(): ...
+def task_example():
+    ...
 ```
 
 And in your Julia script use
@@ -235,7 +236,8 @@ import json
 
 
 @pytask.mark.julia(script="script.jl", serializer=json.dumps, suffix=".json")
-def task_example(): ...
+def task_example():
+    ...
 ```
 
 ### Configuration
