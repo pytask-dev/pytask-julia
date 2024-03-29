@@ -1,15 +1,16 @@
 """Contains test which ensure that the plugin works with pytask-parallel."""
+
 from __future__ import annotations
 
 import textwrap
 
 import pytest
-from pytask import cli
 from pytask import ExitCode
+from pytask import cli
 
+from tests.conftest import ROOT
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
-from tests.conftest import ROOT
 
 try:
     import pytask_parallel  # noqa: F401

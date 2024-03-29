@@ -6,16 +6,16 @@ import textwrap
 from pathlib import Path
 
 import pytest
-from pytask import build
-from pytask import cli
 from pytask import ExitCode
 from pytask import Mark
 from pytask import Task
+from pytask import build
+from pytask import cli
 from pytask_julia.execute import pytask_execute_task_setup
 
+from tests.conftest import ROOT
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
-from tests.conftest import ROOT
 
 
 @pytest.mark.unit()
@@ -40,7 +40,7 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 @pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize("depends_on", ["'in_1.txt'", "['in_1.txt', 'in_2.txt']"])
-def test_run_jl_script(
+def test_run_jl_script(  # noqa: PLR0913
     runner,
     tmp_path,
     parse_config_code,
@@ -211,7 +211,7 @@ def test_run_jl_script_w_wrong_cmd_option(
 @pytest.mark.end_to_end()
 @pytest.mark.parametrize("n_threads", [2, 3])
 @parametrize_parse_code_serializer_suffix
-def test_check_passing_cmd_line_options(
+def test_check_passing_cmd_line_options(  # noqa: PLR0913
     runner,
     tmp_path,
     n_threads,
@@ -256,7 +256,7 @@ def test_check_passing_cmd_line_options(
 )
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize("path", [ROOT, "relative_from_config"])
-def test_run_jl_script_w_environment_in_config(
+def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
     runner,
     tmp_path,
     parse_config_code,

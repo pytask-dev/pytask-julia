@@ -1,4 +1,5 @@
 """Collect tasks."""
+
 from __future__ import annotations
 
 import subprocess
@@ -7,25 +8,25 @@ from pathlib import Path
 from typing import Any
 from typing import Callable
 
-from pytask import has_mark
-from pytask import hookimpl
-from pytask import is_task_function
 from pytask import Mark
 from pytask import NodeInfo
-from pytask import parse_dependencies_from_task_function
-from pytask import parse_products_from_task_function
 from pytask import PathNode
 from pytask import PTask
 from pytask import PythonNode
-from pytask import remove_marks
 from pytask import Session
 from pytask import Task
 from pytask import TaskWithoutPath
-from pytask_julia.serialization import create_path_to_serialized
+from pytask import has_mark
+from pytask import hookimpl
+from pytask import is_task_function
+from pytask import parse_dependencies_from_task_function
+from pytask import parse_products_from_task_function
+from pytask import remove_marks
+
 from pytask_julia.serialization import SERIALIZERS
+from pytask_julia.serialization import create_path_to_serialized
 from pytask_julia.shared import julia
 from pytask_julia.shared import parse_relative_path
-
 
 _SEPARATOR: str = "--"
 """str: Separates options for the Julia executable and arguments to the file."""
@@ -62,9 +63,12 @@ def pytask_collect_task(
         # Parse the @pytask.mark.julia decorator.
         obj, marks = remove_marks(obj, "julia")
         if len(marks) > 1:
-            raise ValueError(
+            msg = (
                 f"Task {name!r} has multiple @pytask.mark.julia marks, but only one is "
-                "allowed.",
+                "allowed."
+            )
+            raise ValueError(
+                msg,
             )
 
         mark = _parse_julia_mark(
@@ -98,10 +102,11 @@ def pytask_collect_task(
         )
 
         if not (isinstance(script_node, PathNode) and script_node.path.suffix == ".jl"):
-            raise ValueError(
+            msg = (
                 "The 'script' keyword of the @pytask.mark.julia decorator must point "
                 f"to Julia file with the .jl suffix, but it is {script_node}."
             )
+            raise ValueError(msg)
 
         options_node = session.hook.pytask_collect_node(
             session=session,
@@ -211,8 +216,7 @@ def _parse_julia_mark(
     else:
         parsed_kwargs["project"] = default_project
 
-    mark = Mark("julia", (), parsed_kwargs)
-    return mark
+    return Mark("julia", (), parsed_kwargs)
 
 
 def _parse_project(project: str | Path | None, root: Path) -> list[str]:
