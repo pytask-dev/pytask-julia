@@ -2,6 +2,60 @@
 requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.0"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "pytask_julia"
+description = "A Pytask plugin for Julia"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pluggy>=1.0.0",
+    "pytask>=0.4.5"
+]
+dynamic = ["version"]
+
+[[project.authors]]
+name = "Tobias Raabe"
+email = "raabe@posteo.de"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/pytask-dev/pytask-julia"
+Changelog = "https://github.com/pytask-dev/pytask-julia/blob/main/CHANGES.md"
+Documentation = "https://github.com/pytask-dev/pytask-julia"
+Github = "https://github.com/pytask-dev/pytask-julia"
+Tracker = "https://github.com/pytask-dev/pytask-julia/issues"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+platforms = ["any"]
+license-files = ["LICENSE"]
+
+[tool.check-manifest]
+ignore = ["src/pytask_julia/_version.py"]
+
+[project.entry-points.pytask]
+pytask_julia = "pytask_julia.plugin"
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
 [tool.setuptools_scm]
 write_to = "src/pytask_julia/_version.py"
 
