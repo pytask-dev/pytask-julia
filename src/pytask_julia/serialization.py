@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 from typing import Callable
-import uuid
 
 from pytask import PTask
 from pytask import PTaskWithPath
