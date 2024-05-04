@@ -31,20 +31,20 @@ You also need to have Julia installed and `julia` on your command line. Test it 
 typing the following on the command line
 
 ```console
-$ julia -h
+julia -h
 ```
 
 If an error is shown instead of a help page, you can install Julia on Unix systems with
 
 ```console
-$ conda install -c conda-forge julia
+conda install -c conda-forge julia
 ```
 
 or choose one of the installers on this [page](https://julialang.org/downloads/).
 
 ## Usage
 
-To create a task which runs a Julia script, define a task function with the
+To create a task that runs a Julia script, define a task function with the
 `@pytask.mark.julia` decorator. The `script` keyword provides a path relative to the
 task module to the Julia script.
 
@@ -111,11 +111,11 @@ config["number"]  # Is 1.
 ### Debugging
 
 In case a task throws an error, you might want to execute the script independently from
-pytask. After a failed execution, you see the command which executed the Julia script in
+pytask. After a failed execution, you see the command that executed the Julia script in
 the report of the task. It looks roughly like this
 
 ```console
-$ julia <options> -- script.jl <path-to>/.pytask/task_py_task_example.json
+julia <options> -- script.jl <path-to>/.pytask/pytask-julia/<uuid>.json
 ```
 
 ### Managing Julia environments
@@ -150,7 +150,7 @@ def task_run_jl_script():
 
 ### Command Line Options
 
-Command line options can be pass via the `options` keyword argument.
+Command line options can be passed via the `options` keyword argument.
 
 ```python
 @task(kwargs={"path": Path("out.csv")})
@@ -159,7 +159,7 @@ def task_run_jl_script():
     pass
 ```
 
-This example will execute the script using to threads.
+This example will execute the script using threads.
 
 ### Repeating tasks with different scripts or inputs
 
@@ -225,8 +225,8 @@ config = YAML.load_file(ARGS[1])
 
 Note that the `YAML` package needs to be installed.
 
-If you need a custom serializer, you can also provide any callable to `serializer` which
-transforms data to a string. Use `suffix` to set the correct file ending.
+If you need a custom serializer, you can also provide any callable for `serializer`
+which transforms data into a string. Use `suffix` to set the correct file ending.
 
 Here is a replication of the JSON example.
 
@@ -255,7 +255,7 @@ julia_serializer = "json"
 **`julia_suffix`**
 
 Use this option to set the default suffix of the file which contains serialized paths to
-dependencies and products and more.
+dependencies, products and more.
 
 ```toml
 [tool.pytask.ini_options]
