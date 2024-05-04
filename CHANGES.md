@@ -7,6 +7,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## 0.x.x - 2024-xx-xx
 
+- {pull}`32` uses trusted publishing for PyPI.
 - {pull}`31` uses pixi to provision Julia if possible.
 
 ## 0.4.0 - 2023-10-08
