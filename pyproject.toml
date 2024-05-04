@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "pytask_julia"
 description = "A Pytask plugin for Julia"
@@ -10,13 +6,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only"
+    "Programming Language :: Python :: 3 :: Only",
 ]
 requires-python = ">=3.8"
-dependencies = [
-    "pluggy>=1.0.0",
-    "pytask>=0.4.5"
-]
+dependencies = ["click", "pluggy>=1.0.0", "pytask>=0.4.5"]
 dynamic = ["version"]
 
 [[project.authors]]
@@ -37,27 +30,35 @@ Documentation = "https://github.com/pytask-dev/pytask-julia"
 Github = "https://github.com/pytask-dev/pytask-julia"
 Tracker = "https://github.com/pytask-dev/pytask-julia/issues"
 
-[tool.setuptools]
-include-package-data = true
-zip-safe = false
-platforms = ["any"]
-license-files = ["LICENSE"]
-
-[tool.check-manifest]
-ignore = ["src/pytask_julia/_version.py"]
-
 [project.entry-points.pytask]
 pytask_julia = "pytask_julia.plugin"
 
-[tool.setuptools.package-dir]
-"" = "src"
+[project.optional-dependencies]
+test = ["pytask-parallel", "pytest", "pytest-cov", "pytest-xdist", "pyyaml"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-namespaces = false
+[tool.rye]
+managed = true
 
-[tool.setuptools_scm]
-write_to = "src/pytask_julia/_version.py"
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pytask_julia/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["tests"]
+only-packages = true
+
+[tool.hatch.build.targets.wheel]
+exclude = ["tests"]
+only-packages = true
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.mypy]
 files = ["src", "tests"]
@@ -81,9 +82,9 @@ unsafe-fixes = true
 
 [tool.ruff.lint]
 extend-ignore = [
-    "ANN401",  # flake8-annotate typing.Any
-    "COM812",  # Comply with ruff-format.
-    "ISC001",  # Comply with ruff-format.
+    "ANN401", # flake8-annotate typing.Any
+    "COM812", # Comply with ruff-format.
+    "ISC001", # Comply with ruff-format.
 ]
 select = ["ALL"]
 
@@ -97,8 +98,7 @@ force-single-line = true
 convention = "numpy"
 
 [tool.pytest.ini_options]
-# Do not add src since it messes with the loading of pytask-parallel as a plugin.
-testpaths = ["tests"]
+testpaths = ["src", "tests"]
 markers = [
     "wip: Tests that are work-in-progress.",
     "unit: Flag for unit tests which target mainly a single function.",
@@ -106,3 +106,40 @@ markers = [
     "end_to_end: Flag for tests that cover the whole program.",
 ]
 norecursedirs = [".idea", ".tox"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.pypi-dependencies]
+pytask_julia = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }
+py38 = { features = ["py38", "test"]}
+py39 = { features = ["py39", "test"]}
+py310 = { features = ["py310", "test"]}
+py311 = { features = ["py311", "test"]}
+py312 = { features = ["py312", "test"]}
+
+[tool.pixi.feature.py38.dependencies]
+python = "3.8.*"
+[tool.pixi.feature.py39.dependencies]
+python = "3.9.*"
+[tool.pixi.feature.py310.dependencies]
+python = "3.10.*"
+[tool.pixi.feature.py311.dependencies]
+python = "3.11.*"
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.test.target.linux-64.dependencies]
+julia = ">=1.0.0"
+
+[tool.pixi.feature.test.target.osx-64.dependencies]
+julia = ">=1.0.0"
+
+[tool.pixi.feature.test.tasks]
+setup-julia = "julia --project=. --eval 'import Pkg; Pkg.instantiate()'"
+test = { cmd = "pytest --cov src --cov tests", depends_on = ["setup-julia"] }

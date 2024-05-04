@@ -5,6 +5,10 @@ chronological order. Releases follow [semantic versioning](https://semver.org/) 
 releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia).
 
+## 0.x.x - 2024-xx-xx
+
+- {pull}`31` uses pixi to provision Julia if possible.
+
 ## 0.4.0 - 2023-10-08
 
 - {pull}`24` prepares the release of pytask v0.4.0.
