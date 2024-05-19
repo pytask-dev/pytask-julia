@@ -16,10 +16,7 @@ from pytask import cli
 )
 @pytest.mark.parametrize("products", [("out.txt",), ("out_1.txt", "out_2.txt")])
 def test_execution_w_varying_dependencies_products(
-    runner,
-    tmp_path,
-    dependencies,
-    products,
+    runner, tmp_path, dependencies, products
 ):
     source = f"""
     import pytask
