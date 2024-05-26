@@ -116,7 +116,7 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 pytask_julia = { path = ".", editable = true }
 
 [tool.pixi.environments]
-default = { solve-group = "default" }
+default = { solve-group = "default", features = ["test", "typing"]}
 test = { features = ["test"], solve-group = "default" }
 py38 = { features = ["py38", "test"]}
 py39 = { features = ["py39", "test"]}
