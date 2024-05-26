@@ -11,6 +11,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 - {pull}`32` uses trusted publishing for PyPI.
 - {pull}`33` uses uuid4 to generate more robust file names for serialized arguments.
 - {pull}`36` updates tests for pytask v0.5.
+- {pull}`37` improves type-checking.
 
 ## 0.4.0 - 2023-10-08
 

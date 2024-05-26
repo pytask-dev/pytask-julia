@@ -42,18 +42,6 @@ repos:
             mdformat-black,
         ]
         args: [--wrap, "88"]
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.10.0'
-    hooks:
-    -   id: mypy
-        additional_dependencies: [
-            attrs>=21.3.0,
-            click,
-            pytask>=0.4.0,
-            types-PyYAML,
-            types-setuptools
-        ]
-        pass_filenames: false
 - repo: https://github.com/codespell-project/codespell
   rev: v2.2.6
   hooks:
