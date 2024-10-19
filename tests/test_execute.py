@@ -49,16 +49,16 @@ def test_run_jl_script(  # noqa: PLR0913
     depends_on,
 ):
     task_source = f"""
-    import pytask
+    from pytask import task, mark
+    from pathlib import Path
 
-    @pytask.mark.julia(
-        script="script.jl",
+    @task(kwargs={{"depends_on": {depends_on}, "produces": "out.txt"}})
+    @mark.julia(
+        script=Path("script.jl"),
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.mark.depends_on({depends_on})
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
@@ -92,16 +92,15 @@ def test_run_jl_script_w_task_decorator(
     runner, tmp_path, parse_config_code, serializer, suffix
 ):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.task
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    @pytask.mark.produces("out.txt")
     def run_jl_script():
         pass
     """
@@ -133,15 +132,15 @@ def test_raise_error_if_julia_is_not_found(
     suffix,
 ):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
@@ -179,16 +178,16 @@ def test_run_jl_script_w_wrong_cmd_option(
     suffix,
 ):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         options=("--wrong-flag"),
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
 
@@ -220,16 +219,16 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
     suffix,
 ):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         options=("--threads", "{n_threads}"),
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
 
@@ -265,14 +264,14 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
     path,
 ):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
@@ -319,15 +318,15 @@ def test_run_jl_script_w_environment_relative_to_task(
     project_in_task = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
 
     task_source = f"""
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{project_in_task}",
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
@@ -352,15 +351,15 @@ def test_run_jl_script_w_environment_relative_to_task(
 @pytest.mark.end_to_end()
 def test_run_jl_script_w_custom_serializer(runner, tmp_path):
     task_source = f"""
-    import pytask
+    from pytask import mark, task
     import json
 
-    @pytask.mark.julia(
+    @task(kwargs={{"produces": "out.txt"}})
+    @mark.julia(
         script="script.jl",
         serializer=json.dumps,
         project="{ROOT.as_posix()}",
     )
-    @pytask.mark.produces("out.txt")
     def task_run_jl_script():
         pass
     """
@@ -385,11 +384,11 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
 @pytest.mark.end_to_end()
 def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
     task_source = """
-    import pytask
+    from pytask import mark, task
 
-    @pytask.mark.julia(script="script.jl")
-    @pytask.mark.julia(script="script.jl")
-    @pytask.mark.produces("out.txt")
+    @task(kwargs={"produces": "out.txt"})
+    @mark.julia(script="script.jl")
+    @mark.julia(script="script.jl")
     def task_run_jl_script():
         pass
     """

@@ -22,7 +22,7 @@ def test_execution_w_varying_dependencies_products(
     import pytask
     from pathlib import Path
 
-    def task_dummy(
+    def task_example(
         depends_on=[Path(p) for p in {dependencies}],
         produces=[Path(p) for p in {products}],
     ):
