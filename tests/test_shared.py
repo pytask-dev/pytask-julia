@@ -3,10 +3,11 @@ from __future__ import annotations
 from contextlib import ExitStack as does_not_raise  # noqa: N813
 
 import pytest
+
 from pytask_julia.shared import julia
 
 
-@pytest.mark.unit()
+@pytest.mark.unit
 @pytest.mark.parametrize(
     ("args", "kwargs", "expectation", "expected"),
     [
