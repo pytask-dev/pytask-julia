@@ -47,7 +47,7 @@ jobs:
         uses: julia-actions/setup-julia@v2
       - uses: prefix-dev/setup-pixi@v0.8.14
         with:
-          pixi-version: v0.22.0
+          pixi-version: v0.50.1
           # cache: true
           environments: ${{ matrix.environment }}
 
