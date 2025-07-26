@@ -36,7 +36,7 @@ def pytask_execute_task_setup(task: PTask) -> None:
         _, _, serializer, _, _ = julia(**marks[0].kwargs)
 
         serialized_node = task.depends_on["_serialized"]
-        path: Path = serialized_node.value  # type: ignore[attr-defined]
+        path: Path = serialized_node.value  # type: ignore[assignment]
         path.parent.mkdir(parents=True, exist_ok=True)
         kwargs = collect_keyword_arguments(task)
         serialize_keyword_arguments(serializer, path, kwargs)
@@ -45,13 +45,13 @@ def pytask_execute_task_setup(task: PTask) -> None:
 def collect_keyword_arguments(task: PTask) -> dict[str, Any]:
     """Collect keyword arguments for function."""
     kwargs: dict[str, Any] = {
-        **tree_map(  # type: ignore[dict-item]
+        **tree_map(
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
-            task.depends_on,
+            task.depends_on,  # type: ignore[arg-type]
         ),
-        **tree_map(  # type: ignore[dict-item]
+        **tree_map(
             lambda x: str(x.path) if isinstance(x, PPathNode) else str(x.value),
-            task.produces,
+            task.produces,  # type: ignore[arg-type]
         ),
     }
     kwargs.pop("_script")

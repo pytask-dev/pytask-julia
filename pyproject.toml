@@ -143,4 +143,4 @@ julia = ">=1.0.0"
 
 [tool.pixi.feature.test.tasks]
 setup-julia = "julia --project=. --eval 'import Pkg; Pkg.instantiate()'"
-test = { cmd = "pytest --cov src --cov tests", depends_on = ["setup-julia"] }
+test = { cmd = "pytest --cov src --cov tests", depends-on = ["setup-julia"] }
