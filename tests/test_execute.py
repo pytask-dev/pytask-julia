@@ -4,6 +4,7 @@ import os
 import sys
 import textwrap
 from pathlib import Path
+from typing import cast
 
 import pytest
 from pytask import ExitCode
@@ -167,8 +168,8 @@ def test_raise_error_if_julia_is_not_found(
     session = build(paths=tmp_path)
 
     assert session.exit_code == ExitCode.FAILED
-    assert session.execution_reports is not None
-    assert isinstance(session.execution_reports[0].exc_info[1], RuntimeError)
+    execution_reports = cast("list", session.execution_reports)
+    assert isinstance(execution_reports[0].exc_info[1], RuntimeError)
 
 
 @needs_julia

@@ -5,18 +5,27 @@ from __future__ import annotations
 import json
 import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
+from typing import TypedDict
 
 from pytask import PTask
 from pytask import PTaskWithPath
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 __all__ = ["SERIALIZERS", "create_path_to_serialized", "serialize_keyword_arguments"]
 
 _HIDDEN_FOLDER = ".pytask/pytask-julia"
 
 
-SERIALIZERS = {
+class SerializerConfig(TypedDict):
+    serializer: Callable[..., str]
+    suffix: str
+
+
+SERIALIZERS: dict[str, SerializerConfig] = {
     "json": {"serializer": json.dumps, "suffix": ".json"},
 }
 
@@ -45,9 +54,9 @@ def serialize_keyword_arguments(
 ) -> None:
     """Serialize keyword arguments."""
     if callable(serializer):
-        serializer_func = serializer
+        serializer_func: Callable[..., str] = serializer
     elif isinstance(serializer, str) and serializer in SERIALIZERS:
-        serializer_func = SERIALIZERS[serializer]["serializer"]  # type: ignore[assignment]
+        serializer_func = SERIALIZERS[serializer]["serializer"]
     else:  # pragma: no cover
         msg = f"Serializer {serializer!r} is not known."
         raise ValueError(msg)
