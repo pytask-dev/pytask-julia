@@ -23,21 +23,22 @@ def test_parametrized_execution_of_jl_script_w_loop(
 ):
     task_source = f"""
     import pytask
+    from pytask import task
+    from pathlib import Path
 
     for i, content in enumerate([
         "Cities breaking down on a camel's back",
          "They just have to go 'cause they don't know whack",
     ]):
 
-        @pytask.mark.task(kwargs={{"content": content}})
+        @task(kwargs={{"content": content}})
         @pytask.mark.julia(
             script="script_1.jl",
             project="{ROOT.as_posix()}",
             serializer="{serializer}",
             suffix="{suffix}"
         )
-        @pytask.mark.produces(f"{{i}}.txt")
-        def task_run_jl_script():
+        def task_run_jl_script(produces=Path(f"{{i}}.txt")):
             pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
