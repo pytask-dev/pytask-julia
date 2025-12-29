@@ -23,6 +23,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
 ):
     task_source = f"""
     import pytask
+    from pytask import task
     from pathlib import Path
 
     for i, content in enumerate([
@@ -30,7 +31,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
          "They just have to go 'cause they don't know whack",
     ]):
 
-        @pytask.mark.task(kwargs={{"content": content}})
+    @task(kwargs={{"content": content}})
         @pytask.mark.julia(
             script="script_1.jl",
             project="{ROOT.as_posix()}",

@@ -100,7 +100,7 @@ def test_run_jl_script_w_task_decorator(
     import pytask
     from pathlib import Path
 
-    @pytask.mark.task
+    @task
     @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
@@ -139,6 +139,7 @@ def test_raise_error_if_julia_is_not_found(
 ):
     task_source = f"""
     import pytask
+    from pytask import task
     from pathlib import Path
 
     @pytask.mark.julia(
