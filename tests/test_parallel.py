@@ -43,6 +43,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
     """
     source = f"""
     import pytask
+    from pathlib import Path
 
     for i in range(1, 3):
 
@@ -53,7 +54,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.task(produces=f"{{i}}.csv")
+        @pytask.task(produces=Path(f"{{i}}.csv"))
         def task_execute_julia():
             pass
     """
@@ -91,6 +92,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
     """
     source = f"""
     import pytask
+    from pathlib import Path
 
     for i in range(2):
 
@@ -101,7 +103,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.task(produces=f"{{i}}.csv")
+        @pytask.task(produces=Path(f"{{i}}.csv"))
         def task_execute_julia_script():
             pass
     """
