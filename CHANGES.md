@@ -7,6 +7,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## 0.x.x - 2024-xx-xx
 
+- {pull}`56` updates pre-commit hooks.
 - {pull}`31` uses pixi to provision Julia if possible.
 - {pull}`32` uses trusted publishing for PyPI.
 - {pull}`33` uses uuid4 to generate more robust file names for serialized arguments.
