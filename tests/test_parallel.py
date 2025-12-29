@@ -53,7 +53,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.mark.produces(f"{{i}}.csv")
+        @pytask.task(produces=f"{{i}}.csv")
         def task_execute_julia():
             pass
     """
@@ -101,7 +101,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.mark.produces(f"{{i}}.csv")
+        @pytask.task(produces=f"{{i}}.csv")
         def task_execute_julia_script():
             pass
     """
