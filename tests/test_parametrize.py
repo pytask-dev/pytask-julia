@@ -37,8 +37,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
             serializer="{serializer}",
             suffix="{suffix}"
         )
-        @pytask.task(produces=Path(f"{{i}}.txt"))
-        def task_run_jl_script():
+        def task_run_jl_script(produces=Path(f"{{i}}.txt")):
             pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
