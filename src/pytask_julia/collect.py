@@ -5,8 +5,8 @@ from __future__ import annotations
 import subprocess
 import warnings
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
 
 from pytask import Mark
 from pytask import NodeInfo
@@ -27,6 +27,9 @@ from pytask_julia.serialization import SERIALIZERS
 from pytask_julia.serialization import create_path_to_serialized
 from pytask_julia.shared import julia
 from pytask_julia.shared import parse_relative_path
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _SEPARATOR: str = "--"
 """str: Separates options for the Julia executable and arguments to the file."""
