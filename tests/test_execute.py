@@ -57,7 +57,7 @@ def test_run_jl_script(  # noqa: PLR0913
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.task(kwargs={"depends_on": {depends_on}}, produces="out.txt")
+    @pytask.task(kwargs={{"depends_on": {depends_on}}}, produces="out.txt")
     def task_run_jl_script():
         pass
     """
