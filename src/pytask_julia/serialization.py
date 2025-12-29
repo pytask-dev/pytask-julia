@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import TypedDict
+from typing import cast
 
 from pytask import PTask
 from pytask import PTaskWithPath
@@ -34,8 +35,14 @@ try:
 except ImportError:  # pragma: no cover
     pass
 else:
-    SERIALIZERS["yaml"] = {"serializer": yaml.dump, "suffix": ".yaml"}
-    SERIALIZERS["yml"] = {"serializer": yaml.dump, "suffix": ".yml"}
+    SERIALIZERS["yaml"] = {
+        "serializer": cast("Callable[..., str]", yaml.dump),
+        "suffix": ".yaml",
+    }
+    SERIALIZERS["yml"] = {
+        "serializer": cast("Callable[..., str]", yaml.dump),
+        "suffix": ".yml",
+    }
 
 
 def create_path_to_serialized(task: PTask, suffix: str) -> Path:
@@ -54,7 +61,7 @@ def serialize_keyword_arguments(
 ) -> None:
     """Serialize keyword arguments."""
     if callable(serializer):
-        serializer_func: Callable[..., str] = serializer
+        serializer_func = cast("Callable[..., str]", serializer)
     elif isinstance(serializer, str) and serializer in SERIALIZERS:
         serializer_func = SERIALIZERS[serializer]["serializer"]
     else:  # pragma: no cover

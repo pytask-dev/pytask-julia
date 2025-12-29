@@ -80,7 +80,9 @@ def pytask_collect_task(
         )
         script, options, _, suffix, project = julia(**mark.kwargs)
 
-        obj.pytask_meta.markers.append(mark)
+        pytask_meta = getattr(obj, "pytask_meta", None)
+        if pytask_meta is not None:
+            pytask_meta.markers.append(mark)
 
         # Collect the nodes in @pytask.mark.julia and validate them.
         path_nodes = Path.cwd() if path is None else path.parent
@@ -145,7 +147,7 @@ def pytask_collect_task(
         dependencies["_options"] = options_node
         dependencies["_project"] = project_node
 
-        markers = obj.pytask_meta.markers if hasattr(obj, "pytask_meta") else []
+        markers = pytask_meta.markers if pytask_meta is not None else []
 
         task: PTask
         if path is None:
@@ -167,7 +169,7 @@ def pytask_collect_task(
             )
 
         # Add serialized node that depends on the task id.
-        serialized = create_path_to_serialized(task, suffix)  # type: ignore[arg-type]
+        serialized = create_path_to_serialized(task, suffix)
         serialized_node = session.hook.pytask_collect_node(
             session=session,
             path=path_nodes,
@@ -209,7 +211,7 @@ def _parse_julia_mark(
         and parsed_kwargs["serializer"] in SERIALIZERS
         else default_suffix
     )
-    parsed_kwargs["suffix"] = suffix or proposed_suffix  # type: ignore[assignment]
+    parsed_kwargs["suffix"] = suffix or proposed_suffix
 
     if isinstance(project, (str, Path)):
         parsed_kwargs["project"] = project
