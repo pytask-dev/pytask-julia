@@ -50,6 +50,7 @@ def test_run_jl_script(  # noqa: PLR0913
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
@@ -57,7 +58,7 @@ def test_run_jl_script(  # noqa: PLR0913
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.task(kwargs={{"depends_on": {depends_on}}}, produces="out.txt")
+    @pytask.task(kwargs={{"depends_on": {depends_on}}}, produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
@@ -92,6 +93,7 @@ def test_run_jl_script_w_task_decorator(
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.task
     @pytask.mark.julia(
@@ -100,7 +102,7 @@ def test_run_jl_script_w_task_decorator(
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def run_jl_script():
         pass
     """
@@ -133,6 +135,7 @@ def test_raise_error_if_julia_is_not_found(
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
@@ -140,7 +143,7 @@ def test_raise_error_if_julia_is_not_found(
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
@@ -179,6 +182,7 @@ def test_run_jl_script_w_wrong_cmd_option(
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
@@ -187,7 +191,7 @@ def test_run_jl_script_w_wrong_cmd_option(
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
 
@@ -220,6 +224,7 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
@@ -228,7 +233,7 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
 
@@ -265,13 +270,14 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
 ):
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
@@ -319,6 +325,7 @@ def test_run_jl_script_w_environment_relative_to_task(
 
     task_source = f"""
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(
         script="script.jl",
@@ -326,7 +333,7 @@ def test_run_jl_script_w_environment_relative_to_task(
         suffix="{suffix}",
         project="{project_in_task}",
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
@@ -352,6 +359,7 @@ def test_run_jl_script_w_environment_relative_to_task(
 def test_run_jl_script_w_custom_serializer(runner, tmp_path):
     task_source = f"""
     import pytask
+    from pathlib import Path
     import json
 
     @pytask.mark.julia(
@@ -359,7 +367,7 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
         serializer=json.dumps,
         project="{ROOT.as_posix()}",
     )
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
@@ -385,10 +393,11 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
 def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
     task_source = """
     import pytask
+    from pathlib import Path
 
     @pytask.mark.julia(script="script.jl")
     @pytask.mark.julia(script="script.jl")
-    @pytask.task(produces="out.txt")
+    @pytask.task(produces=Path("out.txt"))
     def task_run_jl_script():
         pass
     """
