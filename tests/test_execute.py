@@ -98,6 +98,7 @@ def test_run_jl_script_w_task_decorator(
 ):
     task_source = f"""
     import pytask
+    from pytask import task
     from pathlib import Path
 
     @task
