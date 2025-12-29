@@ -36,7 +36,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
             serializer="{serializer}",
             suffix="{suffix}"
         )
-        @pytask.mark.produces(f"{{i}}.txt")
+        @pytask.task(produces=f"{{i}}.txt")
         def task_run_jl_script():
             pass
     """
