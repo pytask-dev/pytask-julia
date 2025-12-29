@@ -43,11 +43,12 @@ def test_parallel_parametrization_over_source_files_w_loop(
     """
     source = f"""
     import pytask
+    from pytask import task
     from pathlib import Path
 
     for i in range(1, 3):
 
-        @pytask.mark.task(kwargs={{"content": i}})
+        @task(kwargs={{"content": i}})
         @pytask.mark.julia(
             script=f"script_{{i}}.jl",
             serializer="{serializer}",
@@ -91,11 +92,12 @@ def test_parallel_parametrization_over_source_file_w_loop(
     """
     source = f"""
     import pytask
+    from pytask import task
     from pathlib import Path
 
     for i in range(2):
 
-        @pytask.mark.task(kwargs={{"number": i}})
+        @task(kwargs={{"number": i}})
         @pytask.mark.julia(
             script="script.jl",
             serializer="{serializer}",
