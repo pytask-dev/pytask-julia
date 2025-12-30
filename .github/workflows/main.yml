@@ -27,7 +27,7 @@ jobs:
         with:
           pixi-version: v0.50.1
           environments: typing
-      - run: pixi run typing
+      - run: pixi run -e typing typing
 
   run-tests:
 

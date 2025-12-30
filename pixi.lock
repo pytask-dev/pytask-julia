@@ -6738,8 +6738,8 @@ packages:
   requires_python: '>=3.10'
 - pypi: ./
   name: pytask-julia
-  version: 0.4.1.dev34+g558260251.d20251230
-  sha256: 4a313827ff24c3d8d91e7a75d2a3a0c0dc2e242e34cc48e731a34cff4823b11f
+  version: 0.4.1.dev35+gf8081d491.d20251230
+  sha256: cecdcaf711ddc36cb43b99a17c527009e65b3a6e8f32d294f37ec372a6bf7cf5
   requires_dist:
   - click
   - pluggy>=1.0.0

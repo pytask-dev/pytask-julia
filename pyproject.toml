@@ -140,4 +140,4 @@ test = { cmd = "pytest --cov src --cov tests", depends-on = ["setup-julia"] }
 ty = ">=0.0.7"
 
 [tool.pixi.feature.typing.tasks]
-typing = "ty check --python .pixi/envs/default src/ tests/"
+typing = "ty check --python .pixi/envs/typing src/ tests/"
