@@ -8,8 +8,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
-requires-python = ">=3.8"
-dependencies = ["click", "pluggy>=1.0.0", "pytask>=0.4.5,<0.5.2"]
+requires-python = ">=3.10"
+dependencies = ["click", "pluggy>=1.0.0", "pytask>=0.4.5"]
 dynamic = ["version"]
 
 [[project.authors]]
@@ -108,22 +108,22 @@ pytask_julia = { path = ".", editable = true }
 [tool.pixi.environments]
 default = { solve-group = "default", features = ["test", "typing"]}
 test = { features = ["test"], solve-group = "default" }
-py38 = { features = ["py38", "test"]}
-py39 = { features = ["py39", "test"]}
 py310 = { features = ["py310", "test"]}
 py311 = { features = ["py311", "test"]}
 py312 = { features = ["py312", "test"]}
+py313 = { features = ["py313", "test"]}
+py314 = { features = ["py314", "test"]}
 
-[tool.pixi.feature.py38.dependencies]
-python = "3.8.*"
-[tool.pixi.feature.py39.dependencies]
-python = "3.9.*"
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"
 [tool.pixi.feature.py311.dependencies]
 python = "3.11.*"
 [tool.pixi.feature.py312.dependencies]
 python = "3.12.*"
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
 
 [tool.pixi.feature.test.target.linux-64.dependencies]
 julia = ">=1.0.0"
