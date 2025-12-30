@@ -33,7 +33,7 @@ Tracker = "https://github.com/pytask-dev/pytask-julia/issues"
 [project.entry-points.pytask]
 pytask_julia = "pytask_julia.plugin"
 
-[project.optional-dependencies]
+[dependency-groups]
 test = ["pytask-parallel", "pytest", "pytest-cov", "pytest-xdist", "pyyaml"]
 typing = ["pyyaml", "ty>=0.0.7"]
 
@@ -104,53 +104,5 @@ unused-ignore-comment = "ignore"
 [tool.pytest.ini_options]
 testpaths = ["src", "tests"]
 markers = [
-    "wip: Tests that are work-in-progress.",
-    "unit: Flag for unit tests which target mainly a single function.",
-    "integration: Flag for integration tests which may comprise of multiple unit tests.",
-    "end_to_end: Flag for tests that cover the whole program.",
 ]
 norecursedirs = [".idea"]
-
-[tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
-
-[tool.pixi.pypi-dependencies]
-pytask_julia = { path = ".", editable = true }
-
-[tool.pixi.environments]
-default = { solve-group = "default", features = ["test", "typing"]}
-test = { features = ["test"], solve-group = "default" }
-typing = { features = ["test", "typing"], solve-group = "default" }
-py310 = { features = ["py310", "test"]}
-py311 = { features = ["py311", "test"]}
-py312 = { features = ["py312", "test"]}
-py313 = { features = ["py313", "test"]}
-py314 = { features = ["py314", "test"]}
-
-[tool.pixi.feature.py310.dependencies]
-python = "3.10.*"
-[tool.pixi.feature.py311.dependencies]
-python = "3.11.*"
-[tool.pixi.feature.py312.dependencies]
-python = "3.12.*"
-[tool.pixi.feature.py313.dependencies]
-python = "3.13.*"
-[tool.pixi.feature.py314.dependencies]
-python = "3.14.*"
-
-[tool.pixi.feature.test.target.linux-64.dependencies]
-julia = ">=1.0.0"
-
-[tool.pixi.feature.test.target.osx-64.dependencies]
-julia = ">=1.0.0"
-
-[tool.pixi.feature.test.tasks]
-setup-julia = "julia --project=. --eval 'import Pkg; Pkg.instantiate()'"
-test = { cmd = "pytest --cov src --cov tests", depends-on = ["setup-julia"] }
-
-[tool.pixi.feature.typing.dependencies]
-ty = ">=0.0.7"
-
-[tool.pixi.feature.typing.tasks]
-typing = "ty check --python .pixi/envs/typing src/ tests/"

@@ -11,7 +11,6 @@ from pytask_julia.collect import _parse_project
 from tests.conftest import ROOT
 
 
-@pytest.mark.unit
 @pytest.mark.parametrize(
     (
         "mark",
@@ -91,7 +90,6 @@ def test_parse_julia_mark(  # noqa: PLR0913
         assert out == expected
 
 
-@pytest.mark.unit
 @pytest.mark.parametrize(
     ("project", "root", "expected"),
     [

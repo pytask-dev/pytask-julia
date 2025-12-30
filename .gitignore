@@ -22,6 +22,4 @@ src/pytask_julia/_version.py
 .ruff_cache
 .pytest_cache
 
-# pixi environments
-.pixi
 *.egg-info
