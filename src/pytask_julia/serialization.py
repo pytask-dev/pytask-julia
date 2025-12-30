@@ -35,14 +35,11 @@ try:
 except ImportError:  # pragma: no cover
     pass
 else:
-    SERIALIZERS["yaml"] = {
-        "serializer": cast("Callable[..., str]", yaml.dump),
-        "suffix": ".yaml",
-    }
-    SERIALIZERS["yml"] = {
-        "serializer": cast("Callable[..., str]", yaml.dump),
-        "suffix": ".yml",
-    }
+    yaml_serializer = cast("Callable[..., str]", yaml.dump)
+    yaml_config: SerializerConfig = {"serializer": yaml_serializer, "suffix": ".yaml"}
+    yml_config: SerializerConfig = {"serializer": yaml_serializer, "suffix": ".yml"}
+    SERIALIZERS["yaml"] = yaml_config
+    SERIALIZERS["yml"] = yml_config
 
 
 def create_path_to_serialized(task: PTask, suffix: str) -> Path:
