@@ -7,6 +7,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## 0.x.x - 2024-xx-xx
 
+- {pull}`56` updates pre-commit hooks.
 - {pull}`54` drops support for Python 3.8 and 3.9 and adds support for Python 3.14.
 - {pull}`31` uses pixi to provision Julia if possible.
 - {pull}`32` uses trusted publishing for PyPI.
