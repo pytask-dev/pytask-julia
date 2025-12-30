@@ -33,7 +33,7 @@ Tracker = "https://github.com/pytask-dev/pytask-julia/issues"
 [project.entry-points.pytask]
 pytask_julia = "pytask_julia.plugin"
 
-[project.optional-dependencies]
+[dependency-groups]
 test = ["pytask-parallel", "pytest", "pytest-cov", "pytest-xdist", "pyyaml"]
 typing = ["pyyaml", "ty>=0.0.7"]
 
