@@ -27,7 +27,6 @@ pytestmark = pytest.mark.skipif(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_files_w_loop(
     runner,
@@ -76,7 +75,6 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_file_w_loop(
     runner,

@@ -7,7 +7,6 @@ import pytest
 from pytask_julia.shared import julia
 
 
-@pytest.mark.unit
 @pytest.mark.parametrize(
     ("args", "kwargs", "expectation", "expected"),
     [

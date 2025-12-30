@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import textwrap
 
-import pytest
 from pytask import ExitCode
 from pytask import cli
 
@@ -12,7 +11,6 @@ from tests.conftest import parametrize_parse_code_serializer_suffix
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_parametrized_execution_of_jl_script_w_loop(
     runner,

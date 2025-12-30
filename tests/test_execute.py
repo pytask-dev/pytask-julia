@@ -19,7 +19,6 @@ from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
 
 
-@pytest.mark.unit
 def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     """Make sure that the task setup raises errors."""
     # Act like julia is installed since we do not test this.
@@ -38,7 +37,6 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize(
     "depends_on",
@@ -92,7 +90,6 @@ def test_run_jl_script(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_task_decorator(
     runner, tmp_path, parse_config_code, serializer, suffix
@@ -130,7 +127,6 @@ def test_run_jl_script_w_task_decorator(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_raise_error_if_julia_is_not_found(
     tmp_path,
@@ -178,7 +174,6 @@ def test_raise_error_if_julia_is_not_found(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_wrong_cmd_option(
     runner,
@@ -217,7 +212,6 @@ def test_run_jl_script_w_wrong_cmd_option(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @pytest.mark.parametrize("n_threads", [2, 3])
 @parametrize_parse_code_serializer_suffix
 def test_check_passing_cmd_line_options(  # noqa: PLR0913
@@ -258,7 +252,6 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @pytest.mark.xfail(
     condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
@@ -312,7 +305,6 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end
 @pytest.mark.xfail(
     condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
@@ -358,7 +350,6 @@ def test_run_jl_script_w_environment_relative_to_task(
 
 
 @needs_julia
-@pytest.mark.end_to_end
 def test_run_jl_script_w_custom_serializer(runner, tmp_path):
     task_source = f"""
     import pytask
@@ -391,7 +382,6 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
 
 
 @needs_julia
-@pytest.mark.end_to_end
 def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
     task_source = """
     import pytask
