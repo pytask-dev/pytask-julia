@@ -82,6 +82,9 @@ def pytask_collect_task(
             default_project=session.config["julia_project"],
         )
         script, options, _, suffix, project = julia(**mark.kwargs)
+        if suffix is None:
+            msg = "No file suffix configured for serialized arguments."
+            raise ValueError(msg)
 
         pytask_meta = getattr(obj, "pytask_meta", None)
         if pytask_meta is not None:
@@ -214,7 +217,11 @@ def _parse_julia_mark(
         and parsed_kwargs["serializer"] in SERIALIZERS
         else default_suffix
     )
-    parsed_kwargs["suffix"] = suffix or proposed_suffix
+    parsed_suffix = suffix or proposed_suffix
+    if parsed_suffix is None:
+        msg = "No file suffix configured for serialized arguments."
+        raise ValueError(msg)
+    parsed_kwargs["suffix"] = parsed_suffix
 
     if isinstance(project, (str, Path)):
         parsed_kwargs["project"] = project

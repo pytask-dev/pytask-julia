@@ -96,7 +96,7 @@ markers = [
     "integration: Flag for integration tests which may comprise of multiple unit tests.",
     "end_to_end: Flag for tests that cover the whole program.",
 ]
-norecursedirs = [".idea", ".tox"]
+norecursedirs = [".idea"]
 
 [tool.pixi.project]
 channels = ["conda-forge"]
@@ -108,6 +108,7 @@ pytask_julia = { path = ".", editable = true }
 [tool.pixi.environments]
 default = { solve-group = "default", features = ["test", "typing"]}
 test = { features = ["test"], solve-group = "default" }
+typing = { features = ["test", "typing"], solve-group = "default" }
 py310 = { features = ["py310", "test"]}
 py311 = { features = ["py311", "test"]}
 py312 = { features = ["py312", "test"]}
@@ -139,4 +140,4 @@ test = { cmd = "pytest --cov src --cov tests", depends-on = ["setup-julia"] }
 ty = ">=0.0.7"
 
 [tool.pixi.feature.typing.tasks]
-typing = "ty check src/ tests/"
+typing = "ty check --python .pixi/envs/typing src/ tests/"
