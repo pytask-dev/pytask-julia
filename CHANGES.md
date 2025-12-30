@@ -9,6 +9,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 - {pull}`56` updates pre-commit hooks.
 - {pull}`54` drops support for Python 3.8 and 3.9 and adds support for Python 3.14.
+- {pull}`55` switches type checking to ty.
 - {pull}`31` uses pixi to provision Julia if possible.
 - {pull}`32` uses trusted publishing for PyPI.
 - {pull}`33` uses uuid4 to generate more robust file names for serialized arguments.
