@@ -35,7 +35,7 @@ pytask_julia = "pytask_julia.plugin"
 
 [dependency-groups]
 test = ["pytask-parallel", "pytest", "pytest-cov", "pytest-xdist", "pyyaml"]
-typing = ["pyyaml", "ty>=0.0.7"]
+typing = ["pyyaml", "ty>=0.0.8"]
 
 [tool.rye]
 managed = true
