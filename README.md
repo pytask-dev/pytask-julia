@@ -20,11 +20,11 @@ pytask-julia is available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia). Install it with
 
 ```console
-$ pip install pytask-julia
+$ uv add pytask-julia
 
 # or
 
-$ conda install -c conda-forge pytask-julia
+$ pixi add pytask-julia
 ```
 
 You also need to have Julia installed and `julia` on your command line. Test it by
@@ -34,13 +34,14 @@ typing the following on the command line
 julia -h
 ```
 
-If an error is shown instead of a help page, you can install Julia on Unix systems with
+If an error is shown instead of a help page, you can install Julia with
 
 ```console
-conda install -c conda-forge julia
+pixi add julia
 ```
 
-or choose one of the installers on this [page](https://julialang.org/downloads/).
+Conda-forge does not provide Julia on all platforms, so you can also choose one of the
+installers on this [page](https://julialang.org/downloads/).
 
 ## Usage
 

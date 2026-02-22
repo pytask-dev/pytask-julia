@@ -8,7 +8,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = ["click", "pluggy>=1.0.0", "pytask>=0.4.5"]
 dynamic = ["version"]
 
@@ -33,9 +33,9 @@ Tracker = "https://github.com/pytask-dev/pytask-julia/issues"
 [project.entry-points.pytask]
 pytask_julia = "pytask_julia.plugin"
 
-[project.optional-dependencies]
+[dependency-groups]
 test = ["pytask-parallel", "pytest", "pytest-cov", "pytest-xdist", "pyyaml"]
-typing = ["mypy", "pyyaml", "types-PyYAML"]
+typing = ["pyyaml", "ty>=0.0.8"]
 
 [tool.rye]
 managed = true
@@ -61,23 +61,7 @@ source = "vcs"
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.mypy]
-files = ["src", "tests"]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-ignore_errors = true
-
 [tool.ruff]
-target-version = "py38"
 fix = true
 unsafe-fixes = true
 
@@ -98,49 +82,27 @@ force-single-line = true
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
+[tool.ty.rules]
+unused-ignore-comment = "error"
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[[tool.ty.overrides]]
+include = ["src/**/_version.py"]
+
+[tool.ty.overrides.rules]
+invalid-type-form = "ignore"
+
+[[tool.ty.overrides]]
+include = ["src/**/__init__.py"]
+
+[tool.ty.overrides.rules]
+unused-ignore-comment = "ignore"
+
+
 [tool.pytest.ini_options]
 testpaths = ["src", "tests"]
 markers = [
-    "wip: Tests that are work-in-progress.",
-    "unit: Flag for unit tests which target mainly a single function.",
-    "integration: Flag for integration tests which may comprise of multiple unit tests.",
-    "end_to_end: Flag for tests that cover the whole program.",
 ]
-norecursedirs = [".idea", ".tox"]
-
-[tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
-
-[tool.pixi.pypi-dependencies]
-pytask_julia = { path = ".", editable = true }
-
-[tool.pixi.environments]
-default = { solve-group = "default", features = ["test", "typing"]}
-test = { features = ["test"], solve-group = "default" }
-py38 = { features = ["py38", "test"]}
-py39 = { features = ["py39", "test"]}
-py310 = { features = ["py310", "test"]}
-py311 = { features = ["py311", "test"]}
-py312 = { features = ["py312", "test"]}
-
-[tool.pixi.feature.py38.dependencies]
-python = "3.8.*"
-[tool.pixi.feature.py39.dependencies]
-python = "3.9.*"
-[tool.pixi.feature.py310.dependencies]
-python = "3.10.*"
-[tool.pixi.feature.py311.dependencies]
-python = "3.11.*"
-[tool.pixi.feature.py312.dependencies]
-python = "3.12.*"
-
-[tool.pixi.feature.test.target.linux-64.dependencies]
-julia = ">=1.0.0"
-
-[tool.pixi.feature.test.target.osx-64.dependencies]
-julia = ">=1.0.0"
-
-[tool.pixi.feature.test.tasks]
-setup-julia = "julia --project=. --eval 'import Pkg; Pkg.instantiate()'"
-test = { cmd = "pytest --cov src --cov tests", depends_on = ["setup-julia"] }
+norecursedirs = [".idea"]

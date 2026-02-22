@@ -7,6 +7,11 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## 0.x.x - 2024-xx-xx
 
+- {pull}`64` switches CI and development tooling from pixi to uv.
+- {pull}`62` removes tox in favor of pixi for typing.
+- {pull}`56` updates pre-commit hooks.
+- {pull}`54` drops support for Python 3.8 and 3.9 and adds support for Python 3.14.
+- {pull}`55` switches type checking to ty.
 - {pull}`31` uses pixi to provision Julia if possible.
 - {pull}`32` uses trusted publishing for PyPI.
 - {pull}`33` uses uuid4 to generate more robust file names for serialized arguments.

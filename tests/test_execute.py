@@ -4,6 +4,7 @@ import os
 import sys
 import textwrap
 from pathlib import Path
+from typing import cast
 
 import pytest
 from pytask import ExitCode
@@ -11,14 +12,13 @@ from pytask import Mark
 from pytask import Task
 from pytask import build
 from pytask import cli
-from pytask_julia.execute import pytask_execute_task_setup
 
+from pytask_julia.execute import pytask_execute_task_setup
 from tests.conftest import ROOT
 from tests.conftest import needs_julia
 from tests.conftest import parametrize_parse_code_serializer_suffix
 
 
-@pytest.mark.unit()
 def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     """Make sure that the task setup raises errors."""
     # Act like julia is installed since we do not test this.
@@ -29,7 +29,7 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     task = Task(
         base_name="example",
         path=Path(),
-        function=None,
+        function=lambda: None,
         markers=[Mark("julia", (), {})],
     )
     with pytest.raises(RuntimeError, match="julia is needed"):
@@ -37,9 +37,11 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
-@pytest.mark.parametrize("depends_on", ["'in_1.txt'", "['in_1.txt', 'in_2.txt']"])
+@pytest.mark.parametrize(
+    "depends_on",
+    ['Path("in_1.txt")', '[Path("in_1.txt"), Path("in_2.txt")]'],
+)
 def test_run_jl_script(  # noqa: PLR0913
     runner,
     tmp_path,
@@ -49,17 +51,19 @@ def test_run_jl_script(  # noqa: PLR0913
     depends_on,
 ):
     task_source = f"""
-    from pytask import task, mark
+    import pytask
     from pathlib import Path
 
-    @task(kwargs={{"depends_on": {depends_on}, "produces": "out.txt"}})
-    @mark.julia(
-        script=Path("script.jl"),
+    @pytask.mark.julia(
+        script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(
+        depends_on={depends_on},
+        produces=Path("out.txt"),
+    ):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -86,22 +90,23 @@ def test_run_jl_script(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_task_decorator(
     runner, tmp_path, parse_config_code, serializer, suffix
 ):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pytask import task
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @task
+    @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    def run_jl_script():
+    def run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -122,7 +127,6 @@ def test_run_jl_script_w_task_decorator(
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_raise_error_if_julia_is_not_found(
     tmp_path,
@@ -132,16 +136,17 @@ def test_raise_error_if_julia_is_not_found(
     suffix,
 ):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pytask import task
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -164,11 +169,11 @@ def test_raise_error_if_julia_is_not_found(
     session = build(paths=tmp_path)
 
     assert session.exit_code == ExitCode.FAILED
-    assert isinstance(session.execution_reports[0].exc_info[1], RuntimeError)
+    execution_reports = cast("list", session.execution_reports)
+    assert isinstance(execution_reports[0].exc_info[1], RuntimeError)
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_run_jl_script_w_wrong_cmd_option(
     runner,
@@ -178,17 +183,17 @@ def test_run_jl_script_w_wrong_cmd_option(
     suffix,
 ):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         options=("--wrong-flag"),
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
 
     """
@@ -207,7 +212,6 @@ def test_run_jl_script_w_wrong_cmd_option(
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @pytest.mark.parametrize("n_threads", [2, 3])
 @parametrize_parse_code_serializer_suffix
 def test_check_passing_cmd_line_options(  # noqa: PLR0913
@@ -219,17 +223,17 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
     suffix,
 ):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         options=("--threads", "{n_threads}"),
         serializer="{serializer}",
         suffix="{suffix}",
         project="{ROOT.as_posix()}"
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
 
     """
@@ -248,7 +252,6 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @pytest.mark.xfail(
     condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
@@ -264,15 +267,15 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
     path,
 ):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -302,7 +305,6 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @pytest.mark.xfail(
     condition=sys.platform == "win32" and os.environ.get("CI") == "true",
     reason="Test folder and repo are on different drives causing relpath to fail.",
@@ -318,16 +320,16 @@ def test_run_jl_script_w_environment_relative_to_task(
     project_in_task = Path(os.path.relpath(ROOT, tmp_path)).as_posix()
 
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         serializer="{serializer}",
         suffix="{suffix}",
         project="{project_in_task}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -348,19 +350,18 @@ def test_run_jl_script_w_environment_relative_to_task(
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 def test_run_jl_script_w_custom_serializer(runner, tmp_path):
     task_source = f"""
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
     import json
 
-    @task(kwargs={{"produces": "out.txt"}})
-    @mark.julia(
+    @pytask.mark.julia(
         script="script.jl",
         serializer=json.dumps,
         project="{ROOT.as_posix()}",
     )
-    def task_run_jl_script():
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
@@ -381,15 +382,14 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
     task_source = """
-    from pytask import mark, task
+    import pytask
+    from pathlib import Path
 
-    @task(kwargs={"produces": "out.txt"})
-    @mark.julia(script="script.jl")
-    @mark.julia(script="script.jl")
-    def task_run_jl_script():
+    @pytask.mark.julia(script="script.jl")
+    @pytask.mark.julia(script="script.jl")
+    def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))

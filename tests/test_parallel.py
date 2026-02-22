@@ -27,7 +27,6 @@ pytestmark = pytest.mark.skipif(
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_files_w_loop(
     runner,
@@ -43,18 +42,19 @@ def test_parallel_parametrization_over_source_files_w_loop(
     """
     source = f"""
     import pytask
+    from pytask import task
+    from pathlib import Path
 
     for i in range(1, 3):
 
-        @pytask.mark.task(kwargs={{"content": i}})
+        @task(kwargs={{"content": i}})
         @pytask.mark.julia(
             script=f"script_{{i}}.jl",
             serializer="{serializer}",
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.mark.produces(f"{{i}}.csv")
-        def task_execute_julia():
+        def task_execute_julia(produces=Path(f"{{i}}.csv")):
             pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
@@ -75,7 +75,6 @@ def test_parallel_parametrization_over_source_files_w_loop(
 
 
 @needs_julia
-@pytest.mark.end_to_end()
 @parametrize_parse_code_serializer_suffix
 def test_parallel_parametrization_over_source_file_w_loop(
     runner,
@@ -91,18 +90,19 @@ def test_parallel_parametrization_over_source_file_w_loop(
     """
     source = f"""
     import pytask
+    from pytask import task
+    from pathlib import Path
 
     for i in range(2):
 
-        @pytask.mark.task(kwargs={{"number": i}})
+        @task(kwargs={{"number": i}})
         @pytask.mark.julia(
             script="script.jl",
             serializer="{serializer}",
             suffix="{suffix}",
             project="{ROOT.as_posix()}",
         )
-        @pytask.mark.produces(f"{{i}}.csv")
-        def task_execute_julia_script():
+        def task_execute_julia_script(produces=Path(f"{{i}}.csv")):
             pass
     """
     tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))

@@ -1,9 +1,10 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
     -   id: check-added-large-files
-        args: ['--maxkb=100']
+        args: ['--maxkb=25']
+        exclude: ^uv\.lock$
     -   id: check-case-conflict
     -   id: check-merge-conflict
     -   id: check-vcs-permalinks
@@ -25,16 +26,16 @@ repos:
     -   id: python-use-type-annotations
     -   id: text-unicode-replacement-char
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.15.1
     hooks:
-      - id: ruff
+      - id: ruff-check
       - id: ruff-format
 -   repo: https://github.com/dosisod/refurb
-    rev: v2.0.0
+    rev: v2.2.0
     hooks:
     -   id: refurb
 -   repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 1.0.0
     hooks:
     -   id: mdformat
         additional_dependencies: [
@@ -42,10 +43,10 @@ repos:
             mdformat-black,
         ]
         args: [--wrap, "88"]
-- repo: https://github.com/codespell-project/codespell
-  rev: v2.2.6
-  hooks:
-    -   id: codespell
+-   repo: https://github.com/crate-ci/typos
+    rev: v1
+    hooks:
+    -   id: typos
 -   repo: meta
     hooks:
     -   id: check-hooks-apply

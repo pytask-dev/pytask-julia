@@ -4,11 +4,14 @@ import shutil
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import pytest
 from click.testing import CliRunner
 from pytask import storage
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 ROOT = Path(__file__).parent.joinpath("..").resolve()
 
@@ -20,7 +23,7 @@ needs_julia = pytest.mark.skipif(
 
 
 parametrize_parse_code_serializer_suffix = pytest.mark.parametrize(
-    "parse_config_code, serializer, suffix",
+    ("parse_config_code", "serializer", "suffix"),
     [
         ("import JSON; config = JSON.parse(read(ARGS[1], String))", "json", ".json"),
         ("import YAML; config = YAML.load_file(ARGS[1])", "yaml", ".yaml"),
@@ -87,6 +90,6 @@ class CustomCliRunner(CliRunner):
             return super().invoke(*args, **kwargs)
 
 
-@pytest.fixture()
+@pytest.fixture
 def runner():
     return CustomCliRunner()
