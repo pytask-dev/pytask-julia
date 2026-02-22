@@ -39,7 +39,7 @@ def test_parametrized_execution_of_jl_script_w_loop(
         def task_run_jl_script(produces=Path(f"{{i}}.txt")):
             pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     for name in ("script_1.jl", "script_2.jl"):
         julia_script = f"""
