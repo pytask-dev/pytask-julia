@@ -57,7 +57,7 @@ def test_parallel_parametrization_over_source_files_w_loop(
         def task_execute_julia(produces=Path(f"{{i}}.csv")):
             pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(source))
 
     julia_script = f"""
     {parse_config_code}
@@ -105,7 +105,7 @@ def test_parallel_parametrization_over_source_file_w_loop(
         def task_execute_julia_script(produces=Path(f"{{i}}.csv")):
             pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(source))
 
     julia_script = f"""
     {parse_config_code}

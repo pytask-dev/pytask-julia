@@ -66,7 +66,7 @@ def test_run_jl_script(  # noqa: PLR0913
     ):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
     tmp_path.joinpath("in_1.txt").touch()
     tmp_path.joinpath("in_2.txt").touch()
 
@@ -109,7 +109,7 @@ def test_run_jl_script_w_task_decorator(
     def run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -149,7 +149,7 @@ def test_raise_error_if_julia_is_not_found(
     def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -197,7 +197,7 @@ def test_run_jl_script_w_wrong_cmd_option(
         pass
 
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -237,7 +237,7 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
         pass
 
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -278,7 +278,7 @@ def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
     def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -332,7 +332,7 @@ def test_run_jl_script_w_environment_relative_to_task(
     def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = f"""
     {parse_config_code}
@@ -364,7 +364,7 @@ def test_run_jl_script_w_custom_serializer(runner, tmp_path):
     def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
 
     julia_script = """
     import JSON; config = JSON.parse(read(ARGS[1], String))
@@ -392,7 +392,7 @@ def test_run_jl_script_fails_w_multiple_markers(runner, tmp_path):
     def task_run_jl_script(produces=Path("out.txt")):
         pass
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(task_source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(task_source))
     tmp_path.joinpath("script.jl").touch()
 
     result = runner.invoke(cli, [tmp_path.as_posix()])

@@ -21,7 +21,7 @@ def test_execution_w_varying_dependencies_products(
     import pytask
     from pathlib import Path
 
-    def task_dummy(
+    def task_example(
         depends_on=[Path(p) for p in {dependencies}],
         produces=[Path(p) for p in {products}],
     ):
@@ -32,7 +32,7 @@ def test_execution_w_varying_dependencies_products(
         for product in produces:
             product.touch()
     """
-    tmp_path.joinpath("task_dummy.py").write_text(textwrap.dedent(source))
+    tmp_path.joinpath("task_example.py").write_text(textwrap.dedent(source))
     for dependency in dependencies:
         tmp_path.joinpath(dependency).touch()
 
