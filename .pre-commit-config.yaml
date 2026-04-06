@@ -26,12 +26,12 @@ repos:
     -   id: python-use-type-annotations
     -   id: text-unicode-replacement-char
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.8
+    rev: v0.15.9
     hooks:
       - id: ruff-check
       - id: ruff-format
 -   repo: https://github.com/dosisod/refurb
-    rev: v2.3.0
+    rev: v2.3.1
     hooks:
     -   id: refurb
 -   repo: https://github.com/executablebooks/mdformat
