@@ -3,20 +3,18 @@
 from __future__ import annotations
 
 import shutil
-from typing import TYPE_CHECKING
+from pathlib import Path
 from typing import Any
 
 from pytask import PPathNode
 from pytask import PTask
+from pytask import PythonNode
 from pytask import get_marks
 from pytask import hookimpl
 from pytask.tree_util import tree_map
 
 from pytask_julia.serialization import serialize_keyword_arguments
 from pytask_julia.shared import julia
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 @hookimpl
@@ -36,7 +34,16 @@ def pytask_execute_task_setup(task: PTask) -> None:
         _, _, serializer, _, _ = julia(**marks[0].kwargs)
 
         serialized_node = task.depends_on["_serialized"]
-        path: Path = serialized_node.value  # type: ignore[assignment]
+        if not isinstance(serialized_node, PythonNode) or not isinstance(
+            serialized_node.value, Path
+        ):
+            msg = (
+                "Expected '_serialized' dependency to be a PythonNode "
+                "containing a Path."
+            )
+            raise TypeError(msg)
+
+        path = serialized_node.value
         path.parent.mkdir(parents=True, exist_ok=True)
         kwargs = collect_keyword_arguments(task)
         serialize_keyword_arguments(serializer, path, kwargs)
