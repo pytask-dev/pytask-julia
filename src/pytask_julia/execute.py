@@ -37,7 +37,10 @@ def pytask_execute_task_setup(task: PTask) -> None:
         if not isinstance(serialized_node, PythonNode) or not isinstance(
             serialized_node.value, Path
         ):
-            msg = "Expected '_serialized' dependency to be a PythonNode containing a Path."
+            msg = (
+                "Expected '_serialized' dependency to be a PythonNode "
+                "containing a Path."
+            )
             raise TypeError(msg)
 
         path = serialized_node.value
