@@ -1,5 +1,5 @@
 [project]
-name = "pytask_julia"
+name = "pytask-julia"
 description = "A Pytask plugin for Julia"
 classifiers = [
     "Development Status :: 4 - Beta",
