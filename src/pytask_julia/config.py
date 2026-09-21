@@ -34,7 +34,7 @@ def pytask_parse_config(config: dict[str, Any]) -> None:
         config["julia_project"] = parse_relative_path(project, config["root"])
 
 
-def _parse_value_or_whitespace_option(value: Any) -> None | list[str]:
+def _parse_value_or_whitespace_option(value: Any) -> list[str] | None:
     """Parse option which can hold a single value or values separated by new lines."""
     if value is None:
         return None
