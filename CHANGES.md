@@ -7,7 +7,7 @@ releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 
 ## Unreleased
 
-- Raise the minimum supported Python version to 3.11.
+- {pull}`154` raises the minimum supported Python version to 3.11.
 
 ## 0.x.x - 2024-xx-xx
 
