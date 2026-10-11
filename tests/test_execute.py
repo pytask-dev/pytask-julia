@@ -42,7 +42,7 @@ def test_pytask_execute_task_setup_missing_julia(monkeypatch):
     "depends_on",
     ['Path("in_1.txt")', '[Path("in_1.txt"), Path("in_2.txt")]'],
 )
-def test_run_jl_script(  # noqa: PLR0913
+def test_run_jl_script(  # noqa: PLR0913, PLR0917
     runner,
     tmp_path,
     parse_config_code,
@@ -214,7 +214,7 @@ def test_run_jl_script_w_wrong_cmd_option(
 @needs_julia
 @pytest.mark.parametrize("n_threads", [2, 3])
 @parametrize_parse_code_serializer_suffix
-def test_check_passing_cmd_line_options(  # noqa: PLR0913
+def test_check_passing_cmd_line_options(  # noqa: PLR0913, PLR0917
     runner,
     tmp_path,
     n_threads,
@@ -258,7 +258,7 @@ def test_check_passing_cmd_line_options(  # noqa: PLR0913
 )
 @parametrize_parse_code_serializer_suffix
 @pytest.mark.parametrize("path", [ROOT, "relative_from_config"])
-def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913
+def test_run_jl_script_w_environment_in_config(  # noqa: PLR0913, PLR0917
     runner,
     tmp_path,
     parse_config_code,

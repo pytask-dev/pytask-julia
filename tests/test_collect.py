@@ -70,7 +70,7 @@ from tests.conftest import ROOT
         ),
     ],
 )
-def test_parse_julia_mark(  # noqa: PLR0913
+def test_parse_julia_mark(  # noqa: PLR0913, PLR0917
     mark,
     default_options,
     default_serializer,
