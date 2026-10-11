@@ -5,6 +5,10 @@ chronological order. Releases follow [semantic versioning](https://semver.org/) 
 releases are available on [PyPI](https://pypi.org/project/pytask-julia) and
 [Anaconda.org](https://anaconda.org/conda-forge/pytask-julia).
 
+## Unreleased
+
+- {pull}`154` raises the minimum supported Python version to 3.11.
+
 ## 0.x.x - 2024-xx-xx
 
 - {pull}`64` switches CI and development tooling from pixi to uv.
